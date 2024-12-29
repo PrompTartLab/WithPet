@@ -10,6 +10,7 @@ Fixes # (issue)
 ## Before submitting
 - [ ] This PR fixes a typo or improves the docs (you can dismiss the other checks if that's the case).
 - [ ] 커밋 컨벤션을 확인하셨나요?
+- [ ] black formatter를 통한 line inting을 확인 하셨나요?
 - **Tag**: Select the appropriate tag for this PR:
   - [ ] `feature`
   - [ ] `fix`
