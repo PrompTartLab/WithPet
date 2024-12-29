@@ -1,6 +1,7 @@
 from models.graph_state import GraphState
 from nodes.base_node import BaseNode
 
+
 class GenerateAnswerNode(BaseNode):
     def execute(self, state):
         chatllm = self.context.llm_stream
@@ -15,6 +16,7 @@ class GenerateAnswerNode(BaseNode):
         final_answer = chatllm.invoke(final_query)
 
         return GraphState(answer=final_answer)
+
 
 class HandleNoDataNode(BaseNode):
     def execute(self, state):

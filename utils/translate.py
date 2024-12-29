@@ -1,10 +1,7 @@
 from langchain_core.prompts import PromptTemplate
 
-def ko_to_eng(
-    template: str,
-    query: str,
-    llm
-) -> str:
+
+def ko_to_eng(template: str, query: str, llm) -> str:
 
     prompt = PromptTemplate(
         template=template,
@@ -15,4 +12,3 @@ def ko_to_eng(
 
     output = llm_chain.invoke(query)
     return output
-

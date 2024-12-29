@@ -1,4 +1,4 @@
-busan_general_knowledge ='''
+busan_general_knowledge = """
 광안리는 수영구에 있다.
 부산역은 동구에 있다.
 해운대는 해운대구에 있다.
@@ -25,4 +25,4 @@ busan_general_knowledge ='''
 동구는 중구, 서구, 사하구, 남구와 접해 있다.
 사상구는 북구, 금정구, 서구와 접해 있다.
 북구는 사상구, 금정구와 접해 있다.
-'''
+"""

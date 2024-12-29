@@ -8,6 +8,7 @@ from nodes.verify_sql import VerifySQLNode
 from nodes.generate_final_answer import GenerateAnswerNode, HandleNoDataNode
 from nodes.routing import get_data_source, get_sql_status
 
+
 class SQLWorkflow:
     """
     부산 관광 정보를 제공하기 위해 RAG(Retrieval-Augmented Generation) 로직을 구성한 클래스.
@@ -41,9 +42,9 @@ class SQLWorkflow:
         self.workflow.add_node("select_data_source", select_data_node.execute)
         self.workflow.add_node("generate_sql", generate_sql_node.execute)
         self.workflow.add_node("retrieve_from_web", web_search_node.execute)
-        self.workflow.add_node("verify_sql", verify_sql_node.execute)  
+        self.workflow.add_node("verify_sql", verify_sql_node.execute)
         self.workflow.add_node("generate_final_answer", generate_answer_node.execute)
-        self.workflow.add_node("handle_no_data", handle_no_data_node.execute) 
+        self.workflow.add_node("handle_no_data", handle_no_data_node.execute)
 
         # 각 노드의 실행이 끝나면 종료(END)로 가는 엣지
         self.workflow.add_edge("generate_sql", "verify_sql")
@@ -56,10 +57,10 @@ class SQLWorkflow:
             "select_data_source",
             get_data_source,
             {
-                'local_tourist_spots': "generate_sql", 
-                'foreign_tourist_spots': "generate_sql",
-                'restaurants': "generate_sql",
-                'web': "retrieve_from_web",
+                "local_tourist_spots": "generate_sql",
+                "foreign_tourist_spots": "generate_sql",
+                "restaurants": "generate_sql",
+                "web": "retrieve_from_web",
             },
         )
 
@@ -67,9 +68,9 @@ class SQLWorkflow:
             "verify_sql",
             get_sql_status,
             {
-                'retry': "generate_sql", 
-                'data exists': "generate_final_answer",
-                'no data': "handle_no_data",
+                "retry": "generate_sql",
+                "data exists": "generate_final_answer",
+                "no data": "handle_no_data",
             },
         )
         # Set entry point

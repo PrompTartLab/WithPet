@@ -40,12 +40,18 @@ sql_generation_template = PromptTemplate(
 
     <QUERY> {question}
     <ANSWER>
-    """
+    """,
 )
 
 # Template for SQL generation (retry attempt)
 sql_retry_template = PromptTemplate(
-    input_variables=["question", "datasource", "schema", "external_knowledge", "previous_answer"],
+    input_variables=[
+        "question",
+        "datasource",
+        "schema",
+        "external_knowledge",
+        "previous_answer",
+    ],
     template="""
     You are an expert in generating SQL queries. Based on the user's question, external knowledge, and the specified data source, generate an SQL query.
 
@@ -58,5 +64,5 @@ sql_retry_template = PromptTemplate(
     User query: {question}
 
     Provide the final SQL query in the <SQL> </SQL> tag.
-    """
+    """,
 )

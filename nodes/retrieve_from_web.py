@@ -6,6 +6,7 @@ from utils.web_search import web_search
 
 from nodes.base_node import BaseNode
 
+
 class WebSearchNode(BaseNode):
     def execute(self, state):
         chatllm = self.context.llm
@@ -13,9 +14,7 @@ class WebSearchNode(BaseNode):
 
         default_translate_params = DefaultTranslateParams()
         translated = ko_to_eng(
-            template=default_translate_params.template,
-            query=query,
-            llm=chatllm
+            template=default_translate_params.template, query=query, llm=chatllm
         )
 
         default_web_params = DefaultWebParams()
@@ -23,7 +22,7 @@ class WebSearchNode(BaseNode):
             template=default_web_params.template,
             serpapi_params=default_web_params.serpapi_params,
             query=translated,
-            llm=chatllm
+            llm=chatllm,
         )
         print(output)
         return GraphState(web_response=output.content)

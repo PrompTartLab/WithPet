@@ -3,11 +3,12 @@ from models.graph_state import GraphState
 from models.response_schema import RouteQuery
 from nodes.base_node import BaseNode
 
+
 class SelectDataNode(BaseNode):
     def execute(self, state):
         chatllm = self.context.llm
         question = state["question"]
-    
+
         structured_llm = chatllm.with_structured_output(RouteQuery)
 
         # Prompt 정의
@@ -21,10 +22,11 @@ class SelectDataNode(BaseNode):
         """
 
         prompt = ChatPromptTemplate.from_messages(
-            [("system", system), ("human", "{question}")])
+            [("system", system), ("human", "{question}")]
+        )
 
-        # Define router 
+        # Define router
         router = prompt | structured_llm
-        
+
         response = router.invoke(question)
-        return GraphState(data_source = response.datasource)
+        return GraphState(data_source=response.datasource)

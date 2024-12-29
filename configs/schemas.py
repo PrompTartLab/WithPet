@@ -1,13 +1,13 @@
 schemas = {
-    "local_tourist_spots": '''
+    "local_tourist_spots": """
         - Description: This table contains information about tourist spots for local visitors.
         - Columns:
             - Tourist_Spot_Name_Korean (TEXT): The name of the tourist spot in Korean.
             - District (TEXT): The district (구) where the tourist spot is located.
             - Major_Category (CATEGORICAL): The category of the tourist spot. Possible values: ['역사관광지', '건축/조형물', '휴양관광지', '쇼핑', '체험관광지', '자연관광지', '육상 레포츠', '음식점', '문화시설', '산업관광지', '숙박시설', '수상 레포츠', '레포츠소개'].
             - Number_of_Visit (INTEGER): The number of visitors to the tourist spot.
-    ''',
-    "foreign_tourist_spots": '''
+    """,
+    "foreign_tourist_spots": """
         - Description: This table contains information about tourist spots for foreign visitors.
         - Columns:
             - Tourist_Spot_Name_English (TEXT): The name of the tourist spot in English.
@@ -15,8 +15,8 @@ schemas = {
             - District (TEXT): The district (구) where the tourist spot is located.
             - Major_Category (CATEGORICAL): The category of the tourist spot. Possible values: ['역사관광지', '휴양관광지', '체험관광지', '쇼핑', '자연관광지', '건축/조형물', '육상 레포츠', '산업관광지', '문화시설', '수상 레포츠', '음식점', '공연/행사', '숙박시설', '레포츠소개'].
             - Number_of_Visit (INTEGER): The number of visitors to the tourist spot.
-    ''',
-    "restaurants":'''
+    """,
+    "restaurants": """
         - Description: This table contains information about popular restaurants in Busan.
         - Columns:
             - MENU_TYPE (TEXT): The type of menu offered at the restaurant (e.g., 한식, 중식, 분식).
@@ -41,5 +41,5 @@ schemas = {
             - PARKING_LOT_YN (BOOLEAN): Whether the restaurant provides parking (True/False).
             - PAYMENT_OPTIONS (TEXT): Payment options available (e.g., credit cards).
             - REVIEW (TEXT): Customer reviews for the restaurant.
-'''
+""",
 }

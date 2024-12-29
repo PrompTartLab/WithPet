@@ -18,6 +18,7 @@ class ChatCallbackHandler(BaseCallbackHandler):
     """
     LLM이 토큰 단위로 출력할 때마다 Streamlit UI에 실시간 업데이트해주는 콜백 핸들러입니다.
     """
+
     message = ""
 
     def on_llm_start(self, *args, **kwargs):

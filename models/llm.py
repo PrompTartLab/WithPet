@@ -5,13 +5,9 @@ import os
 load_dotenv()
 
 CHATLLM = ChatOpenAI(
-    model="gpt-4",
-    temperature=0,
-    openai_api_key=os.getenv("OPENAI_API_KEY")
+    model="gpt-4", temperature=0, openai_api_key=os.getenv("OPENAI_API_KEY")
 )
 
 BASELLM = OpenAI(
-    model="gpt-4",
-    temperature=0,
-    openai_api_key=os.getenv("OPENAI_API_KEY")
+    model="gpt-4", temperature=0, openai_api_key=os.getenv("OPENAI_API_KEY")
 )

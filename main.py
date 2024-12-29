@@ -2,6 +2,7 @@ from workflows.sql_workflow import SQLWorkflow
 from models.graph_state import GraphState
 from models.llm import CHATLLM, BASELLM
 
+
 def main():
 
     tour_rag = SQLWorkflow(CHATLLM, BASELLM)
@@ -12,7 +13,8 @@ def main():
     )
 
     result = app.invoke(initial_state)
-    print("Final Answer:", result['answer'])
+    print("Final Answer:", result["answer"])
+
 
 if __name__ == "__main__":
     main()
