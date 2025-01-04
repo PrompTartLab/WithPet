@@ -1,10 +1,25 @@
 import streamlit as st
+import os
 
 from langchain_openai import OpenAI
 from models.llm import CHATLLM
 from workflows.sql_workflow import SQLWorkflow
 from utils.data_utils import load_csv_to_sqlite
 from langchain.callbacks.base import BaseCallbackHandler
+
+# LangSmith 설정
+from langchain_core.tracers import LangChainTracer
+from langchain.callbacks.manager import CallbackManager
+
+
+# OpenAI API 키 로드
+OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
+
+# Langsmith tracing을 위한 키 로드
+LANGCHAIN_API_KEY = st.secrets["LANGCHAIN_API_KEY"]
+LANGCHAIN_PROJECT = st.secrets["LANGCHAIN_PROJECT"]
+LANGCHAIN_TRACING_V2 = "true"
+LANGCHAIN_ENDPOINT = "https://api.smith.langchain.com"
 
 # 페이지 설정
 st.set_page_config(page_title="TourGuideRAG", page_icon="🎡")
@@ -57,8 +72,8 @@ def paint_history() -> None:
         send_message(msg["message"], msg["role"], save=False)
 
 
-# OpenAI API 키 로드
-OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
+tracer = LangChainTracer(project_name=LANGCHAIN_PROJECT)
+callback_manager = CallbackManager([tracer])
 
 csv_files = {
     "data/내국인 관심 관광지_수정.csv": "local_tourist_spots",
@@ -79,8 +94,12 @@ app = tour_rag.app
 
 # UI 구성
 st.title("부산 관광 가이드🧳")
-st.write("🌟부산 관광 가이드 챗봇에 오신 것을 환영합니다! 궁금하신 정보를 질문해주세요.")
-st.write("🌟예시 질문: 10월 부산 날씨를 알려주세요. 부산역 근처 국밥 맛집을 알려주세요.")
+st.write(
+    "🌟부산 관광 가이드 챗봇에 오신 것을 환영합니다! 궁금하신 정보를 질문해주세요."
+)
+st.write(
+    "🌟예시 질문: 10월 부산 날씨를 알려주세요. 부산역 근처 국밥 맛집을 알려주세요."
+)
 
 paint_history()
 
