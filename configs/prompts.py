@@ -1,7 +1,15 @@
 from langchain_core.prompts import PromptTemplate
 
+SOURCE_ROUTING_PROMPT = """
+You are an expert at routing a user question to the appropriate data source.
+Based on the category the question is referring to, route it to the relevant data source.
+Return "tourist_spots" if the query asks for recommendation of tourist spots.
+Return "restaurants" if the query requests restaurant recommendations.
+Returns "web" if it is not related to tourist attractions or restaurants, such as weather or transportation.
+    """
+
 # Template for SQL generation (initial attempt)
-sql_generation_template = PromptTemplate(
+SQL_GENERATION_TEMPLATE = PromptTemplate(
     input_variables=["question", "datasource", "schema", "external_knowledge"],
     template="""
     You are an expert in generating SQL queries. Based on the user's question, external knowledge and the specified data source, generate an SQL query. 
@@ -44,7 +52,7 @@ sql_generation_template = PromptTemplate(
 )
 
 # Template for SQL generation (retry attempt)
-sql_retry_template = PromptTemplate(
+SQL_RETRY_TEMPLATE = PromptTemplate(
     input_variables=[
         "question",
         "datasource",

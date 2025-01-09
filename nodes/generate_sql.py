@@ -1,7 +1,7 @@
 from models.graph_state import GraphState
 from configs.schemas import schemas
 from configs.knowledge import busan_general_knowledge
-from configs.prompts import sql_generation_template, sql_retry_template
+from configs.prompts import SQL_GENERATION_TEMPLATE, SQL_RETRY_TEMPLATE
 from nodes.base_node import BaseNode
 
 
@@ -18,7 +18,7 @@ class GenerateSQLNode(BaseNode):
         if sql_status == "retry":
             previous_answer = state["sql_response"]
 
-            sql_chain = sql_retry_template | chatllm
+            sql_chain = SQL_RETRY_TEMPLATE | chatllm
             response = sql_chain.invoke(
                 {
                     "question": question,
@@ -29,7 +29,7 @@ class GenerateSQLNode(BaseNode):
                 }
             )
         else:
-            sql_chain = sql_generation_template | chatllm
+            sql_chain = SQL_GENERATION_TEMPLATE | chatllm
             response = sql_chain.invoke(
                 {
                     "question": question,
