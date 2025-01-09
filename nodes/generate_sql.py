@@ -8,12 +8,11 @@ from nodes.base_node import BaseNode
 class GenerateSQLNode(BaseNode):
     def execute(self, state):
         chatllm = self.context.llm
-        datasource = state[
-            "data_source"
-        ]  # Example: 'local_tourist_spots' or 'foreign_tourist_spots'
+        data_source = state["data_source"]
         question = state["question"]
+        examples = state["examples"]
         sql_status = state.get("sql_status", [])
-        schema = schemas.get(datasource, {})
+        schema = schemas.get(data_source, {})
 
         if sql_status == "retry":
             previous_answer = state["sql_response"]
@@ -22,7 +21,8 @@ class GenerateSQLNode(BaseNode):
             response = sql_chain.invoke(
                 {
                     "question": question,
-                    "datasource": datasource,
+                    "data_source": data_source,
+                    "examples": examples,
                     "schema": schema,
                     "external_knowledge": busan_general_knowledge,
                     "previous_answer": previous_answer,
@@ -33,11 +33,12 @@ class GenerateSQLNode(BaseNode):
             response = sql_chain.invoke(
                 {
                     "question": question,
-                    "datasource": datasource,
+                    "data_source": data_source,
+                    "examples": examples,
                     "schema": schema,
                     "external_knowledge": busan_general_knowledge,
                 }
             )
 
         print(response.content)
-        return GraphState(sql_response=response.content)
+        return GraphState(schema=schema, sql_response=response.content)

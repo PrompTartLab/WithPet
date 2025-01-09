@@ -8,9 +8,16 @@ Return "restaurants" if the query requests restaurant recommendations.
 Returns "web" if it is not related to tourist attractions or restaurants, such as weather or transportation.
     """
 
-# Template for SQL generation (initial attempt)
-SQL_GENERATION_TEMPLATE = PromptTemplate(
-    input_variables=["question", "datasource", "schema", "external_knowledge"],
+# Template for SQL generation (retry attempt)
+SQL_RETRY_TEMPLATE = PromptTemplate(
+    input_variables=[
+        "question",
+        "data_source",
+        "examples",
+        "schema",
+        "external_knowledge",
+        "previous_answer",
+    ],
     template="""
 You are an expert in generating SQL queries. Your task is to create SQL queries based on the user's question and the provided schema.
 
@@ -33,17 +40,17 @@ For your information, I'll provide examples of query-answer pairs.
 {examples}
 
 <QUESTION> {question} </QUESTION>
-    """,
+        """,
 )
 
-# Template for SQL generation (retry attempt)
-SQL_RETRY_TEMPLATE = PromptTemplate(
+# Template for SQL generation (initial attempt)
+SQL_GENERATION_TEMPLATE = PromptTemplate(
     input_variables=[
         "question",
-        "datasource",
+        "data_source",
+        "examples",
         "schema",
         "external_knowledge",
-        "previous_answer",
     ],
     template="""
 You are an expert in generating SQL queries. Your task is to create SQL queries based on the user's question and the provided schema. You must follow these rules:
