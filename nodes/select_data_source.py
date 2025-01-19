@@ -20,4 +20,5 @@ class SelectDataNode(BaseNode):
         router = prompt | structured_llm
 
         response = router.invoke(question)
+        print(response.datasource)
         return GraphState(data_source=response.datasource)

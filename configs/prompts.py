@@ -2,11 +2,11 @@ from langchain_core.prompts import PromptTemplate
 
 SOURCE_ROUTING_PROMPT = """
 You are an expert at routing a user question to the appropriate data source.
-Based on the category the question is referring to, route it to the relevant data source.
-Return "tourist_spots" if the query asks for recommendation of tourist spots.
-Return "restaurants" if the query requests restaurant recommendations.
-Returns "web" if it is not related to tourist attractions or restaurants, such as weather or transportation.
-    """
+Return "pet_places" if the query asks for information or recommendations about places or facilities, regardless of whether the query explicitly mentions pets or pet-related keywords.
+Return "web" if it is not related to facilities but is about general information or knowledge about pets.
+Return "not_relevant" if the query is neither about facilities nor information about pets.
+"""
+
 
 # Template for SQL generation (retry attempt)
 SQL_RETRY_TEMPLATE = PromptTemplate(
