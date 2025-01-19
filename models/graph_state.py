@@ -9,7 +9,6 @@ class GraphState(TypedDict):
     sql_response: str
     sql_status: str
     trial_num: int
-    sql_filtered_data: str
-    rag_filtered_data: str
+    filtered_data: str
     web_response: str
     answer: str
