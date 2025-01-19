@@ -6,16 +6,24 @@ class GenerateAnswerNode(BaseNode):
     def execute(self, state):
         chatllm = self.context.llm_stream
         question = state["question"]
-        data = state["web_response"] if state["data_source"] == "web" else state["data"]
+        schema = state["schema"]
+        data = (
+            state["web_response"]
+            if state["data_source"] == "web"
+            else state["rag_filtered_data"]
+        )
         final_query = f"""
             Based on the user's question: {question}
-            and the following retrieved information:
+            From the table with schema:
+            {schema}
+            Retrieved information is:
             {data}
             Please provide a detailed and concise answer in Korean.
+            The data may not match the question completely. If so, please explain the content of the retrieved data, but notify that it may not match the question.
             """
         final_answer = chatllm.invoke(final_query)
 
-        return GraphState(answer=final_answer)
+        return GraphState(answer=final_answer.content)
 
 
 class HandleNoDataNode(BaseNode):
