@@ -1,6 +1,5 @@
 from models.graph_state import GraphState
 from configs.schemas import SCHEMAS
-from configs.knowledge import busan_general_knowledge
 from configs.prompts import SQL_GENERATION_TEMPLATE
 from nodes.base_node import BaseNode
 
@@ -20,7 +19,7 @@ class GenerateSQLNode(BaseNode):
                 "data_source": data_source,
                 "examples": examples,
                 "schema": schema,
-                "external_knowledge": busan_general_knowledge,
+                "external_knowledge": '',
             }
         )
 
