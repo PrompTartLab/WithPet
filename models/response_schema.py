@@ -5,7 +5,7 @@ from typing import Literal
 class RouteQuery(BaseModel):
     """Route a user query to the most relevant datasource."""
 
-    datasource: Literal["pet_places", "not_relevant", "web"] = Field(
+    datasource: Literal["pet_places", "not_relevant", "children_places"] = Field(
         ...,
         description="Given a user question choose which datasource would be most relevant for answering their question",
     )

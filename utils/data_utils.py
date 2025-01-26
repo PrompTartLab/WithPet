@@ -41,16 +41,9 @@ def format_docs_with_metadata(docs):
         formatted_docs.append(f"<Data {i+1}>\n{metadata_str}\n{doc.page_content}")
     return "\n\n".join(formatted_docs)
 
-
 def format_dataframe(df, data_source):
-    formatted_docs = []
-    for i, row in df.iterrows():
-        metadata_str = "\n".join(
-            [
-                f"{column}: {row[column]}"
-                for column in df.columns
-                if pd.notnull(row[column])
-            ]
-        )
-        formatted_docs.append(f"<Data {i+1}>\n{metadata_str}")
-    return "\n\n".join(formatted_docs)
+    columns = ['RESTAURANT_NAME_KOREAN', 'FOOD_TYPE', 'ADDRESS_KOREAN', 'MENU_NAME', 'NATIONAL_PHONE_NUMBER', 
+            'BREAKFAST_YN', 'LUNCH_YN', 'DINNER_YN', 'BEER_YN', 'OUTDOOR_SEAT_YN', 'MENU_FOR_CHILDREN_YN', 'RESTROOM_YN', 'PARKING_LOT_YN',
+            'DISTRICT', 'RESTAURANT_NAME_ENGLISH', 'ADDRESS_ENGLISH', 'REVIEW'] if data_source == 'restaurants' else ['PLACE_NM', 'ADDRESS', 'TEL_NO', 'SEASON_NM', 'CATEGORY', 'AREA', 'DESCRIPTION']
+    return df[columns].to_markdown(index=False)
+

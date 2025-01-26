@@ -1,10 +1,14 @@
 from langchain_core.prompts import PromptTemplate
+from configs.schemas import SCHEMAS
 
-SOURCE_ROUTING_PROMPT = """
-You are an expert at routing a user question to the appropriate data source.
-Return "pet_places" if the query asks for information or recommendations about places or facilities, regardless of whether the query explicitly mentions pets or pet-related keywords.
-Return "web" if it is not related to facilities but is about general information or knowledge about pets.
-Return "not_relevant" if the query is neither about facilities nor information about pets.
+SOURCE_ROUTING_PROMPT = f"""
+You are an expert at routing a user question to the appropriate data source. The data sources are described below:
+
+{print('\n'.join(SCHEMAS.values()))}
+
+Return "pet_places" if the query can be answered by using PET_PLACES.
+Return "children_places" if the query can be answered by using CHILDREN_PLACES.
+Return "not_relevant" if the query cannot be answered by any data source.
 """
 
 
@@ -69,5 +73,22 @@ For your information, I'll provide examples of query-answer pairs.
 {examples}
 
 <QUESTION> {question} </QUESTION>
+    """,
+)
+
+ANSWER_GENERATION_TEMPLATE = PromptTemplate(
+    input_variables=[
+        "question",
+        "schema",
+        "data",
+    ],
+    template="""
+Based on the user's question: {question}
+From the table with schema:
+{schema}
+Retrieved information is:
+{data}
+Please provide a detailed and concise answer in Korean.
+The data may not match the question completely. If so, please explain the content of the retrieved data, but notify that it may not match the question.
     """,
 )

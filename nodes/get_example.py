@@ -8,12 +8,12 @@ class GetExampleNode(BaseNode):
         question = state["question"]
 
         examples_topk = self.context.vs_example.similarity_search(
-            question, k=3, filter={"source": data_source}
+            question, k=10, filter={"source": data_source}
         )
         examples_format = "\n\n".join(
             [
                 f"<QUESTION> {doc.metadata["question"]} </QUESTION>\n<SQL> {doc.metadata["sql"]} </SQL>"
-                for doc in examples_topk
+                for doc in examples_topk[:3]
             ]
         )
         print(examples_format)

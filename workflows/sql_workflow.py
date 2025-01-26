@@ -48,14 +48,12 @@ class SQLWorkflow:
         self.workflow.add_node("get_example", get_example_node.execute)
         self.workflow.add_node("generate_sql", generate_sql_node.execute)
         self.workflow.add_node("verify_sql", verify_sql_node.execute)
-        self.workflow.add_node("retrieve_from_web", web_search_node.execute)
         self.workflow.add_node("generate_final_answer", generate_answer_node.execute)
         self.workflow.add_node("handle_no_data", handle_no_data_node.execute)
         self.workflow.add_node("handle_not_relevant", handle_not_relevant_node.execute)
 
         self.workflow.add_edge("get_example", "generate_sql")
         self.workflow.add_edge("generate_sql", "verify_sql")
-        self.workflow.add_edge("retrieve_from_web", "generate_final_answer")
         self.workflow.add_edge("generate_final_answer", END)
         self.workflow.add_edge("handle_no_data", END)
 
@@ -64,7 +62,7 @@ class SQLWorkflow:
             check_data_source,
             {
                 "pet_places": "get_example",
-                "web": "retrieve_from_web",
+                "children_places": "get_example",
                 "not_relevant" : "handle_not_relevant"
             },
         )
