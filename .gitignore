@@ -1,3 +1,6 @@
 # folder
 .streamlit/
 *.pyc
+
+# file
+test.ipynb
