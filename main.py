@@ -15,7 +15,6 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 csv_files = {
     "data/PET_PLACES.csv": "PET_PLACES",
-    "data/CHILDREN_PLACES.csv": "CHILDREN_PLACES",
 }
 
 
@@ -38,7 +37,7 @@ def main():
     app = tour_rag.setup_workflow()
 
     initial_state = GraphState(
-        question="종로구에 무료 주차되는  알려줘",
+        question="종로구에 무료 주차되는 카페 알려줘",
     )
 
 
