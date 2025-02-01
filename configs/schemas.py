@@ -63,5 +63,5 @@ SCHEMAS = {
     - NRSGRM_AT (TEXT): Indicates whether a nursing room is available (Y/N).
     - STROLLER_LEND_AT (TEXT): Indicates whether stroller rental is available (Y/N).
     - KIDS_ZONE_AT (TEXT): Indicates whether there is a designated kids' zone (Y/N).
-    """
+    """,
 }

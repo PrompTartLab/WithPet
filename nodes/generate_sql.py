@@ -20,9 +20,9 @@ class GenerateSQLNode(BaseNode):
                 "data_source": data_source,
                 "examples": examples,
                 "schema": schema,
-                "external_knowledge": '',
+                "external_knowledge": "",
             }
         )
 
-        print('\n', response.content)
+        print("\n", response.content)
         return GraphState(schema=schema, sql_response=response.content)

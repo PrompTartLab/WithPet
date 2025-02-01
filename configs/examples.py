@@ -113,6 +113,5 @@ EXAMPLES = [
         "question": "부산 남구에서 연령 제한이 없는 키즈존이 있는 놀이공원을 추천해주세요.",
         "sql": "SELECT * FROM children_places WHERE CTPRVN_NM = '부산광역시' AND SIGNGU_NM = '남구' AND CTGRY_THREE_NM LIKE '%놀이공원%' AND ENTRN_POSBL_BN_VALUE = '연령제한없음' AND KIDS_ZONE_AT = 'Y'",
         "source": "children_places",
-    }
-
+    },
 ]
