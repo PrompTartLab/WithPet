@@ -4,11 +4,9 @@ from configs.schemas import SCHEMAS
 SOURCE_ROUTING_PROMPT = f"""
 You are an expert at routing a user question to the appropriate data source. The data sources are described below:
 
-{print('\n'.join(SCHEMAS.values()))}
+Return "pet_places" if the query is about finding or asking for facilities such as hospitals, museums, cafes, restaurants, hotels, or any other physical locations where services or activities are provided.
 
-Return "pet_places" if the query can be answered by using PET_PLACES.
-Return "children_places" if the query can be answered by using CHILDREN_PLACES.
-Return "not_relevant" if the query cannot be answered by any data source.
+Return "not_relevant" if the query is not related to finding facilities, such as general knowledge questions or general chat.
 """
 
 
