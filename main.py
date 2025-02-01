@@ -31,19 +31,16 @@ def main():
         text_embeddings=question_embeddings, embedding=embeddings, metadatas=EXAMPLES
     )
 
-    tour_rag = SQLWorkflow(
-        CHATLLM, CHATLLM, conn, vectorstore_examples
-    )
+    tour_rag = SQLWorkflow(CHATLLM, CHATLLM, conn, vectorstore_examples)
     app = tour_rag.setup_workflow()
 
     initial_state = GraphState(
         question="종로구에 무료 주차되는 카페 알려줘",
     )
 
-
     try:
         result = app.invoke(initial_state, {"recursion_limit": 7})
-        print('\n', result["answer"])
+        print("\n", result["answer"])
     except GraphRecursionError:
         print("에러가 발생했습니다. 다시 시도해주세요.")
 
