@@ -23,9 +23,7 @@ class PerformRAGNode(BaseNode):
         print(results)
         if len(results) == 0:
             return GraphState(
-                rag_filtered_data=format_dataframe(
-                    filtered_data.head(5), data_source
-                )
+                rag_filtered_data=format_dataframe(filtered_data.head(5), data_source)
             )
         rag_filtered_data = format_docs_with_metadata(results)
         return GraphState(filtered_data=rag_filtered_data)

@@ -3,13 +3,18 @@ from models.graph_state import GraphState
 from models.context import Context
 from nodes.select_data_source import SelectDataNode
 from nodes.get_example import GetExampleNode
-from nodes.generate_sql import GenerateSQLNode 
+from nodes.generate_sql import GenerateSQLNode
 from nodes.verify_sql import VerifySQLNode
 from nodes.perform_rag import PerformRAGNode
 from nodes.retrieve_from_web import WebSearchNode
 from nodes.execute_sql import ExecuteSQLNode
-from nodes.generate_final_answer import GenerateAnswerNode, HandleNoDataNode, HandleNotRelevantNode
+from nodes.generate_final_answer import (
+    GenerateAnswerNode,
+    HandleNoDataNode,
+    HandleNotRelevantNode,
+)
 from nodes.routing import check_data_source, check_sql_status
+
 
 class SQLWorkflow:
     """
@@ -18,9 +23,7 @@ class SQLWorkflow:
     내부적으로 SQLite를 사용하여 CSV 데이터를 관리한다.
     """
 
-    def __init__(
-        self, llm_chat, llm_stream, conn, vector_store_example
-    ):
+    def __init__(self, llm_chat, llm_stream, conn, vector_store_example):
         """
         Args:
             llm_chat: 모델 function call(Structured LLM)을 활용할 수 있는 LLM (ex. ChatOpenAI)
@@ -29,9 +32,7 @@ class SQLWorkflow:
         self.llm_chat = llm_chat
         self.llm_stream = llm_stream
         self.workflow = StateGraph(GraphState)
-        self.context = Context(
-            llm_chat, llm_stream, conn, vector_store_example, None
-        )
+        self.context = Context(llm_chat, llm_stream, conn, vector_store_example, None)
         self.app = None
 
     def setup_workflow(self):
@@ -63,22 +64,23 @@ class SQLWorkflow:
             {
                 "pet_places": "get_example",
                 "children_places": "get_example",
-                "not_relevant" : "handle_not_relevant"
+                "not_relevant": "handle_not_relevant",
             },
         )
         self.workflow.add_conditional_edges(
             "verify_sql",
             check_sql_status,
             {
-                'retry': "generate_sql", 
-                'data exists': "generate_final_answer",
-                'no data': "handle_no_data",
+                "retry": "generate_sql",
+                "data exists": "generate_final_answer",
+                "no data": "handle_no_data",
             },
         )
 
         self.workflow.set_entry_point("select_data_source")
         self.app = self.workflow.compile()
         return self.app
+
 
 class SQLRAGWorkflow:
     """
