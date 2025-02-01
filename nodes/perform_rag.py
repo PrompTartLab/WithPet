@@ -9,13 +9,13 @@ class PerformRAGNode(BaseNode):
     def execute(self, state):
         question = state["question"]
         data_source = state["data_source"]
-        sql_filtered_data = state["sql_filtered_data"]
+        filtered_data = state["filtered_data"]
         retriever = self.context.vs_data.as_retriever(
             search_kwargs={
                 "k": 10,
                 "filter": {
                     "SOURCE": data_source,
-                    "INDEX": sql_filtered_data["INDEX"].to_list(),
+                    "INDEX": filtered_data["INDEX"].to_list(),
                 },
             }
         )
@@ -23,9 +23,7 @@ class PerformRAGNode(BaseNode):
         print(results)
         if len(results) == 0:
             return GraphState(
-                rag_filtered_data=format_dataframe(
-                    sql_filtered_data.head(5), data_source
-                )
+                rag_filtered_data=format_dataframe(filtered_data.head(5), data_source)
             )
         rag_filtered_data = format_docs_with_metadata(results)
-        return GraphState(rag_filtered_data=rag_filtered_data)
+        return GraphState(filtered_data=rag_filtered_data)

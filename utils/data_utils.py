@@ -74,14 +74,4 @@ def format_dataframe(df, data_source):
             "DESCRIPTION",
         ]
     )
-    formatted_docs = []
-    for i, row in df.iterrows():
-        metadata_str = "\n".join(
-            [
-                f"{column}: {row[column]}"
-                for column in columns
-                if pd.notnull(row[column])
-            ]
-        )
-        formatted_docs.append(f"<Data {i+1}>\n{metadata_str}")
-    return "\n\n".join(formatted_docs)
+    return df[columns].to_markdown(index=False)

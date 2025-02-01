@@ -1,12 +1,14 @@
 from langchain_core.prompts import PromptTemplate
+from configs.schemas import SCHEMAS
 
-SOURCE_ROUTING_PROMPT = """
-You are an expert at routing a user question to the appropriate data source.
-Based on the category the question is referring to, route it to the relevant data source.
-Return "tourist_spots" if the query asks for recommendation of tourist spots.
-Return "restaurants" if the query requests restaurant recommendations.
-Returns "web" if it is not related to tourist attractions or restaurants, such as weather or transportation.
-    """
+SOURCE_ROUTING_PROMPT = f"""
+You are an expert at routing a user question to the appropriate data source. The data sources are described below:
+
+Return "pet_places" if the query is about finding or asking for facilities such as hospitals, museums, cafes, restaurants, hotels, or any other physical locations where services or activities are provided.
+
+Return "not_relevant" if the query is not related to finding facilities, such as general knowledge questions or general chat.
+"""
+
 
 # Template for SQL generation (retry attempt)
 SQL_RETRY_TEMPLATE = PromptTemplate(
@@ -69,5 +71,22 @@ For your information, I'll provide examples of query-answer pairs.
 {examples}
 
 <QUESTION> {question} </QUESTION>
+    """,
+)
+
+ANSWER_GENERATION_TEMPLATE = PromptTemplate(
+    input_variables=[
+        "question",
+        "schema",
+        "data",
+    ],
+    template="""
+Based on the user's question: {question}
+From the table with schema:
+{schema}
+Retrieved information is:
+{data}
+Please provide a detailed and concise answer in Korean.
+The data may not match the question completely. If so, please explain the content of the retrieved data, but notify that it may not match the question.
     """,
 )

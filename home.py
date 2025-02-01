@@ -1,11 +1,13 @@
 import streamlit as st
 import os
 
-from langchain_openai import OpenAI
+from langchain_openai import OpenAI, OpenAIEmbeddings
 from models.llm import CHATLLM
 from workflows.sql_workflow import SQLWorkflow
 from utils.data_utils import load_csv_to_sqlite
+from configs.examples import EXAMPLES
 from langchain.callbacks.base import BaseCallbackHandler
+from langchain.vectorstores import FAISS
 
 # LangSmith 설정
 from langchain_core.tracers import LangChainTracer
@@ -76,9 +78,7 @@ tracer = LangChainTracer(project_name=LANGCHAIN_PROJECT)
 callback_manager = CallbackManager([tracer])
 
 csv_files = {
-    "data/내국인 관심 관광지_수정.csv": "local_tourist_spots",
-    "data/외국인 관심 관광지_수정.csv": "foreign_tourist_spots",
-    "data/busan_restrau_20to24_witch_eng_data.csv": "restaurants",
+    "data/pet_places.csv": "pet_places",
 }
 
 # LLM 인스턴스 준비
@@ -89,29 +89,38 @@ llm_stream = OpenAI(
 )
 
 conn = load_csv_to_sqlite(csv_files)
-tour_rag = SQLWorkflow(CHATLLM, llm_stream, conn)
-app = tour_rag.app
+
+questions = [item["question"] for item in EXAMPLES]
+embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
+question_embeddings = [
+    (question, embeddings.embed_query(question)) for question in questions
+]
+vectorstore_examples = FAISS.from_embeddings(
+    text_embeddings=question_embeddings, embedding=embeddings, metadatas=EXAMPLES
+)
+
+tour_rag = SQLWorkflow(CHATLLM, llm_stream, conn, vectorstore_examples)
+app = tour_rag.setup_workflow()
 
 # UI 구성
-st.title("부산 관광 가이드🧳")
+st.title("반려동물 동반 시설 가이드")
 st.write(
-    "🌟부산 관광 가이드 챗봇에 오신 것을 환영합니다! 궁금하신 정보를 질문해주세요."
+    "🌟반려동물 동반 시설  가이드 챗봇에 오신 것을 환영합니다! 궁금하신 정보를 질문해주세요."
 )
 st.write(
-    "🌟예시 질문: 10월 부산 날씨를 알려주세요. 부산역 근처 국밥 맛집을 알려주세요."
+    "🌟예시 질문: 종로구 무악동에 있는 24시간 동물병원을 알려주세요. 부산 동구에 있는 주차 가능한 카페를 알려주세요. 인천에 있는 반려동물 동반 추가요금 없는 펜션 알려주세요."
 )
 
 paint_history()
 
 # 사용자 입력 처리
-message = st.chat_input("Ask anything about Busan tour...")
+message = st.chat_input("Ask anything about pet facilities...")
 
 if message:
     send_message(message, "human")
     inputs = {"question": message}
     with st.chat_message("ai"):
         response = app.invoke(inputs)
-        print(response)
 
 button = st.sidebar.button("Show Workflow")
 if button:
