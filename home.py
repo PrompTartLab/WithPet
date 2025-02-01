@@ -99,15 +99,17 @@ vectorstore_examples = FAISS.from_embeddings(
     text_embeddings=question_embeddings, embedding=embeddings, metadatas=EXAMPLES
 )
 
-tour_rag = SQLWorkflow(
-    CHATLLM, llm_stream, conn, vectorstore_examples
-)
+tour_rag = SQLWorkflow(CHATLLM, llm_stream, conn, vectorstore_examples)
 app = tour_rag.setup_workflow()
 
 # UI 구성
 st.title("반려동물 동반 시설 가이드")
-st.write("🌟반려동물 동반 시설  가이드 챗봇에 오신 것을 환영합니다! 궁금하신 정보를 질문해주세요.")
-st.write("🌟예시 질문: 종로구 무악동에 있는 24시간 동물병원을 알려주세요. 부산 동구에 있는 주차 가능한 카페를 알려주세요. 인천에 있는 반려동물 동반 추가요금 없는 펜션 알려주세요.")
+st.write(
+    "🌟반려동물 동반 시설  가이드 챗봇에 오신 것을 환영합니다! 궁금하신 정보를 질문해주세요."
+)
+st.write(
+    "🌟예시 질문: 종로구 무악동에 있는 24시간 동물병원을 알려주세요. 부산 동구에 있는 주차 가능한 카페를 알려주세요. 인천에 있는 반려동물 동반 추가요금 없는 펜션 알려주세요."
+)
 
 paint_history()
 
