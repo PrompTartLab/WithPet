@@ -78,7 +78,7 @@ tracer = LangChainTracer(project_name=LANGCHAIN_PROJECT)
 callback_manager = CallbackManager([tracer])
 
 csv_files = {
-    "data/pet_places.csv": "pet_places",
+    "./data/pet_places.csv": "pet_places",
 }
 
 # LLM 인스턴스 준비

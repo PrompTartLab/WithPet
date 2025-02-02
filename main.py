@@ -14,7 +14,7 @@ load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 csv_files = {
-    "data/PET_PLACES.csv": "PET_PLACES",
+    "./data/PET_PLACES.csv": "PET_PLACES",
 }
 
 
