@@ -12,7 +12,7 @@ class GetExampleNode(BaseNode):
         )
         examples_format = "\n\n".join(
             [
-                f"<QUESTION> {doc.metadata["question"]} </QUESTION>\n<SQL> {doc.metadata["sql"]} </SQL>"
+                f'<QUESTION> {doc.metadata["question"]} </QUESTION>\n<SQL> {doc.metadata["sql"]} </SQL>'
                 for doc in examples_topk[:3]
             ]
         )
