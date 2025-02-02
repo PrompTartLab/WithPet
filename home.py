@@ -8,8 +8,6 @@ from utils.data_utils import load_csv_to_sqlite
 from configs.examples import EXAMPLES
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.vectorstores import FAISS
-
-# LangSmith 설정
 from langchain_core.tracers import LangChainTracer
 from langchain.callbacks.manager import CallbackManager
 
