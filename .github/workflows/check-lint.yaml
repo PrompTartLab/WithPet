@@ -3,17 +3,22 @@ name: Check Line Linting
 on:
   pull_request:
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 jobs:
-  linelint:
+  check-pr-label:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
 
-      # PR 라벨 확인
       - name: Get PR labels
         id: pr-labels
+        continue-on-error: true
         run: |
           pr_number="${{ github.event.pull_request.number }}"
           labels_json=$(gh pr view $pr_number --json labels -q '.labels[].name')
@@ -23,9 +28,15 @@ jobs:
             echo "has_maintenance=false" >> $GITHUB_OUTPUT
           fi
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 줄바꿈 체크
+  check-linelint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
       - name: Check for missing end line breaks
         run: |
           # 따옴표를 제거하고 파일 목록 가져오기

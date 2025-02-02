@@ -2,25 +2,22 @@ name: Auto Assign and Label
 
 on:
   pull_request:
-    types: [opened, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
 
 jobs:
   assign-reviewers-assignees:
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
     steps:
       - uses: kentaro-m/auto-assign-action@v2.0.0
 
   label-lang:
     runs-on: ubuntu-latest
     continue-on-error: true
-
-    permissions:
-      contents: read
-      pull-requests: write
-
     steps:
       - uses: actions/labeler@v5
         with:
-          repo-token: ${{ github.token }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
