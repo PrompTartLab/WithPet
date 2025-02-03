@@ -72,6 +72,29 @@ def paint_history() -> None:
         send_message(msg["message"], msg["role"], save=False)
 
 
+@st.cache_resource
+def get_sqlite_connection(csv_files):
+    return load_csv_to_sqlite(csv_files)
+
+
+@st.cache_resource
+def get_embeddings(api_key):
+    return OpenAIEmbeddings(openai_api_key=api_key)
+
+
+@st.cache_resource
+def get_vectorstore_examples(examples, OPENAI_API_KEY):
+    questions = [item["question"] for item in examples]
+    embeddings = get_embeddings(OPENAI_API_KEY)
+    question_embeddings = [
+        (question, embeddings.embed_query(question)) for question in questions
+    ]
+    vectorstore = FAISS.from_embeddings(
+        text_embeddings=question_embeddings, embedding=embeddings, metadatas=examples
+    )
+    return vectorstore
+
+
 tracer = LangChainTracer(project_name=LANGCHAIN_PROJECT)
 callback_manager = CallbackManager([tracer])
 
@@ -86,16 +109,10 @@ llm_stream = OpenAI(
     openai_api_key=OPENAI_API_KEY,
 )
 
-conn = load_csv_to_sqlite(csv_files)
+conn = get_sqlite_connection(csv_files)
 
 questions = [item["question"] for item in EXAMPLES]
-embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
-question_embeddings = [
-    (question, embeddings.embed_query(question)) for question in questions
-]
-vectorstore_examples = FAISS.from_embeddings(
-    text_embeddings=question_embeddings, embedding=embeddings, metadatas=EXAMPLES
-)
+vectorstore_examples = get_vectorstore_examples(EXAMPLES, OPENAI_API_KEY)
 
 tour_rag = SQLWorkflow(CHATLLM, llm_stream, conn, vectorstore_examples)
 app = tour_rag.setup_workflow()
