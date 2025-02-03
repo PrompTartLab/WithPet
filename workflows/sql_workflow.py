@@ -31,7 +31,7 @@ class SQLWorkflow:
             llm_chat: 모델 function call(Structured LLM)을 활용할 수 있는 LLM (ex. ChatOpenAI)
             llm: 최종 답변 생성을 위한 LLM
         """
-        self.csv_files = {"./data/pet_places.csv": "pet_places"}
+        self.csv_files = {"./data/PET_PLACES.csv": "PET_PLACES"}
         self.conn = load_csv_to_sqlite(self.csv_files)
         self.llm_chat = llm_chat
         self.llm_stream = llm_stream
