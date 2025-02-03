@@ -1,7 +1,8 @@
 import streamlit as st
 import os
+import time
 
-from langchain_openai import OpenAI, OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from models.llm import CHATLLM
 from workflows.sql_workflow import SQLWorkflow
 from utils.data_utils import load_csv_to_sqlite
@@ -72,9 +73,9 @@ def paint_history() -> None:
         send_message(msg["message"], msg["role"], save=False)
 
 
-@st.cache_resource
-def get_sqlite_connection(csv_files):
-    return load_csv_to_sqlite(csv_files)
+# @st.cache_resource
+# def get_sqlite_connection(csv_files):
+#     return load_csv_to_sqlite(csv_files)
 
 
 @st.cache_resource
@@ -102,19 +103,23 @@ csv_files = {
     "./data/pet_places.csv": "pet_places",
 }
 
+# 미리 생성하여 유지
+chat_callback_handler = ChatCallbackHandler()
+
 # LLM 인스턴스 준비
-llm_stream = OpenAI(
+llm_stream = ChatOpenAI(
+    model="gpt-4o",
     streaming=True,
-    callbacks=[ChatCallbackHandler()],
+    callbacks=[chat_callback_handler],
     openai_api_key=OPENAI_API_KEY,
 )
 
-conn = get_sqlite_connection(csv_files)
+# conn = get_sqlite_connection(csv_files)
 
 questions = [item["question"] for item in EXAMPLES]
 vectorstore_examples = get_vectorstore_examples(EXAMPLES, OPENAI_API_KEY)
 
-tour_rag = SQLWorkflow(CHATLLM, llm_stream, conn, vectorstore_examples)
+tour_rag = SQLWorkflow(CHATLLM, llm_stream, vectorstore_examples)
 app = tour_rag.setup_workflow()
 
 # UI 구성
@@ -136,6 +141,9 @@ if message:
     inputs = {"question": message}
     with st.chat_message("ai"):
         response = app.invoke(inputs)
+    if response["data_source"] == "not_relevant" or response["sql_status"] == "no data":
+        send_message(response["answer"], "ai")
+        st.rerun()
 
 button = st.sidebar.button("Show Workflow")
 if button:

@@ -15,6 +15,8 @@ from nodes.generate_final_answer import (
 )
 from nodes.routing import check_data_source, check_sql_status
 
+from utils.data_utils import load_csv_to_sqlite
+
 
 class SQLWorkflow:
     """
@@ -23,16 +25,20 @@ class SQLWorkflow:
     내부적으로 SQLite를 사용하여 CSV 데이터를 관리한다.
     """
 
-    def __init__(self, llm_chat, llm_stream, conn, vector_store_example):
+    def __init__(self, llm_chat, llm_stream, vector_store_example):
         """
         Args:
             llm_chat: 모델 function call(Structured LLM)을 활용할 수 있는 LLM (ex. ChatOpenAI)
             llm: 최종 답변 생성을 위한 LLM
         """
+        self.csv_files = {"./data/pet_places.csv": "pet_places"}
+        self.conn = load_csv_to_sqlite(self.csv_files)
         self.llm_chat = llm_chat
         self.llm_stream = llm_stream
         self.workflow = StateGraph(GraphState)
-        self.context = Context(llm_chat, llm_stream, conn, vector_store_example, None)
+        self.context = Context(
+            llm_chat, llm_stream, self.conn, vector_store_example, None
+        )
         self.app = None
 
     def setup_workflow(self):
