@@ -18,7 +18,7 @@ class GenerateAnswerNode(BaseNode):
         final_answer = chain.invoke(
             {
                 "question": question,
-                "schema": "schema",
+                "schema": schema,
                 "data": data,
             }
         )
@@ -30,7 +30,7 @@ class GenerateAnswerNode(BaseNode):
 class HandleNotRelevantNode(BaseNode):
     def execute(self, state):
         return GraphState(
-            answer="해당 질문은 이 챗봇 가이드에서 대답드릴 수 없습니다. 반려동물/유아 동반 가능한 시설에 대해 질문해주세요."
+            answer="해당 질문은 이 챗봇 가이드에서 대답드릴 수 없습니다. 반려동물 동반 시설에 대해 질문해주세요."
         )
 
 
