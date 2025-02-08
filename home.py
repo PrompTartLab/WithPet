@@ -115,8 +115,8 @@ st.markdown(
 
 st.markdown(
     """
-    <p style="text-align: center; font-size: 18px; color: #555;">
-        <strong>반려동물과 함께 할 수 있는 장소를 찾아보세요! 🐶🐱</strong>
+    <p style="text-align: center; font-size: 18px; color: #555; font-weight: bold;">
+        반려동물과 함께 할 수 있는 장소를 찾아보세요! 🐶🐱
     </p>
     """,
     unsafe_allow_html=True,
