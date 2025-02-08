@@ -150,8 +150,6 @@ if "selected_parking" not in st.session_state:
     st.session_state.selected_parking = False
 if "selected_24h" not in st.session_state:
     st.session_state.selected_24h = False
-if "selected_dedicated" not in st.session_state:
-    st.session_state.selected_dedicated = False
 if "selected_pet_friendly" not in st.session_state:
     st.session_state.selected_pet_friendly = False
 if "selected_all_size" not in st.session_state:
@@ -172,7 +170,7 @@ with st.sidebar:
         category = st.radio(
             "시설 유형",  # Empty label to remove space
             [
-                "🍽️ 식당",
+                "☕ 카페",
                 "🏡 펜션",
                 "🏨 호텔",
                 "🏥 동물병원",
@@ -182,7 +180,7 @@ with st.sidebar:
                 "🏢 위탁관리",
             ],
             index=[
-                "식당",
+                "카페",
                 "펜션",
                 "호텔",
                 "동물병원",
@@ -197,9 +195,6 @@ with st.sidebar:
         st.markdown("### 🔍 추가 옵션")
         parking = st.checkbox("🚗 주차 가능", value=st.session_state.selected_parking)
         open_24h = st.checkbox("⏰ 24시간 운영", value=st.session_state.selected_24h)
-        dedicated = st.checkbox(
-            "🐾 반려동물 전용 시설", value=st.session_state.selected_dedicated
-        )
         pet_friendly = st.checkbox(
             "🪙 반려동물 추가 요금 없음", value=st.session_state.selected_pet_friendly
         )
@@ -213,7 +208,6 @@ with st.sidebar:
             st.session_state.selected_category = category.split()[1]
             st.session_state.selected_parking = parking
             st.session_state.selected_24h = open_24h
-            st.session_state.selected_dedicated = dedicated
             st.session_state.selected_pet_friendly = pet_friendly
             st.session_state.selected_all_size = all_size
 
@@ -223,8 +217,6 @@ with st.sidebar:
                 options.append("주차 가능")
             if st.session_state.selected_24h:
                 options.append("24시간 운영")
-            if st.session_state.selected_dedicated:
-                options.append("반려동물 전용 시설")
             if st.session_state.selected_pet_friendly:
                 options.append("반려동물 추가 요금 없음")
             if st.session_state.selected_all_size:
