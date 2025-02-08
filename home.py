@@ -84,19 +84,6 @@ def get_embeddings(api_key):
     return OpenAIEmbeddings(openai_api_key=api_key)
 
 
-@st.cache_resource
-def get_vectorstore_examples(examples, OPENAI_API_KEY):
-    questions = [item["question"] for item in examples]
-    embeddings = get_embeddings(OPENAI_API_KEY)
-    question_embeddings = [
-        (question, embeddings.embed_query(question)) for question in questions
-    ]
-    vectorstore = FAISS.from_embeddings(
-        text_embeddings=question_embeddings, embedding=embeddings, metadatas=examples
-    )
-    return vectorstore
-
-
 tracer = LangChainTracer(project_name=LANGCHAIN_PROJECT)
 callback_manager = CallbackManager([tracer])
 
@@ -108,7 +95,11 @@ llm_stream = ChatOpenAI(
     callbacks=[chat_callback_handler],
     openai_api_key=OPENAI_API_KEY,
 )
-vectorstore_examples = get_vectorstore_examples(EXAMPLES, OPENAI_API_KEY)
+vectorstore_examples = FAISS.load_local(
+    "faiss_example",
+    get_embeddings(OPENAI_API_KEY),
+    allow_dangerous_deserialization=True,
+)
 tour_rag = SQLWorkflow(CHATLLM, llm_stream, vectorstore_examples)
 app = tour_rag.setup_workflow()
 
@@ -219,7 +210,7 @@ with st.sidebar:
         submitted = st.form_submit_button("🔎 검색하기")
 
         if submitted:
-            st.session_state.selected_category = category[2:]
+            st.session_state.selected_category = category.split()[1]
             st.session_state.selected_parking = parking
             st.session_state.selected_24h = open_24h
             st.session_state.selected_dedicated = dedicated
