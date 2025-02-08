@@ -116,7 +116,7 @@ st.markdown(
 st.markdown(
     """
     <p style="text-align: center; font-size: 18px; color: #555;">
-        반려동물과 함께 할 수 있는 장소를 찾아보세요! 🐶🐱
+        <strong>반려동물과 함께 할 수 있는 장소를 찾아보세요! 🐶🐱</strong>
     </p>
     """,
     unsafe_allow_html=True,
@@ -132,9 +132,9 @@ st.markdown(
     ">
         <h5 style="color: #FF6B00;">💡 이용 가능한 질문 예시</h5>
         <ul style="font-size: 16px; color: #333;">
-            <li>🏥 <b>종로구</b>에 있는 <b>24시간 동물병원</b>을 알려주세요.</li>
-            <li>🏡 <b>인천</b>에 있는 <b>반려동물 추가 요금 없는 펜션</b>을 찾아주세요.</li>
+            <li>🏥 <b>강남구 신사동</b>에 있는 <b>24시간 동물병원</b>을 알려주세요.</li>
             <li>☕ <b>부산 동구</b>에 있는 <b>주차 가능한 카페</b>가 있나요?</li>
+            <li>🏡 <b>인천</b>에 있는 <b>반려동물 추가 요금 없는 펜션</b>을 찾아주세요.</li>
         </ul>
     </div>
     """,
