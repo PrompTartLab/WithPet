@@ -172,22 +172,21 @@ with st.sidebar:
         category = st.radio(
             "시설 유형",  # Empty label to remove space
             [
-                "☕ 카페",
                 "🍽️ 식당",
                 "🏡 펜션",
                 "🏨 호텔",
                 "🏥 동물병원",
+                "💊 동물약국",
                 "✂️ 미용",
                 "🛒 반려동물용품",
                 "🏢 위탁관리",
             ],
             index=[
-                "카페",
                 "식당",
                 "펜션",
                 "호텔",
                 "동물병원",
-                "미용",
+                "동물약국" "미용",
                 "반려동물용품",
                 "위탁관리",
             ].index(st.session_state.selected_category),
@@ -201,7 +200,7 @@ with st.sidebar:
             "🐾 반려동물 전용 시설", value=st.session_state.selected_dedicated
         )
         pet_friendly = st.checkbox(
-            "🐕 반려동물 추가 요금 없음", value=st.session_state.selected_pet_friendly
+            "🪙 반려동물 추가 요금 없음", value=st.session_state.selected_pet_friendly
         )
         all_size = st.checkbox(
             "🐈 반려동물 크기 제한 없음", value=st.session_state.selected_all_size
