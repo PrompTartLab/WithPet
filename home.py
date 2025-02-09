@@ -140,6 +140,16 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+st.markdown(
+    """
+    <div>
+        <p style="font-size: 14px; color: #666; text-align: center; margin-top: 15px;">
+            <i>※ 해당 챗봇이 제공하는 모든 시설은 반려동물 동반 가능 시설입니다.</i>
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 st.markdown("<br><br>", unsafe_allow_html=True)
 
 
