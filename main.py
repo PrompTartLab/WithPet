@@ -18,12 +18,10 @@ def main():
 
     embeddings = OpenAIEmbeddings(openai_api_key=os.getenv("OPENAI_API_KEY"))
 
-    questions = [item["question"] for item in EXAMPLES]
-    question_embeddings = [
-        (question, embeddings.embed_query(question)) for question in questions
-    ]
-    vectorstore_examples = FAISS.from_embeddings(
-        text_embeddings=question_embeddings, embedding=embeddings, metadatas=EXAMPLES
+    vectorstore_examples = FAISS.load_local(
+        "faiss_example",
+        embeddings,
+        allow_dangerous_deserialization=True,
     )
 
     tour_rag = SQLWorkflow(CHATLLM, CHATLLM, vectorstore_examples)
