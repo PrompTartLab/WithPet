@@ -15,6 +15,7 @@ SCHEMAS = {
     - HOMEPAGE_URL (TEXT): Website URL of the facility.
     - HOLIDAY_INFORMATION (TEXT): Information about facility closure days.
     - OPERATION_TIME (TEXT): Operating hours of the facility. (e.g. 월화수목금 10:00~19:00, 토일요일 10:00~19:00, 법정공휴일 10:00~17:00)
+    - OPERATION_TIME_DISPLAY (TEXT): Operating hours of the facility for display. Do not use this column in sql filtering.
     - PARKING_LOT_YN (TEXT): Indicates whether parking is available (Y/N).
     - USAGE_PRICE (TEXT): Details about usage fees.
     - POSIBLE_PET_SIZE (TEXT): Size limits for pets allowed entry.

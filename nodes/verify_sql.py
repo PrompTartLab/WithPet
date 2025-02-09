@@ -12,7 +12,7 @@ columns = {
         "TEL_NO",
         "HOMEPAGE_URL",
         "HOLIDAY_INFORMATION",
-        "OPERATION_TIME",
+        "OPERATION_TIME_DISPLAY",
         "PARKING_LOT_YN",
         "USAGE_PRICE",
         "POSIBLE_PET_SIZE",
