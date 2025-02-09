@@ -146,14 +146,10 @@ st.markdown("<br><br>", unsafe_allow_html=True)
 # Initialize session state for user selections
 if "selected_category" not in st.session_state:
     st.session_state.selected_category = "카페"
-if "selected_parking" not in st.session_state:
-    st.session_state.selected_parking = False
-if "selected_24h" not in st.session_state:
-    st.session_state.selected_24h = False
-if "selected_pet_friendly" not in st.session_state:
-    st.session_state.selected_pet_friendly = False
-if "selected_all_size" not in st.session_state:
-    st.session_state.selected_all_size = False
+
+# Initialize session state list for selected options
+if "selected_options" not in st.session_state:
+    st.session_state.selected_options = []
 
 # Sidebar Design
 with st.sidebar:
@@ -192,37 +188,28 @@ with st.sidebar:
             label_visibility="collapsed",
         )
 
+        checkbox_options = {
+            "🚗 주차 가능": "주차 가능",
+            "🗓️ 주말 운영": "주말 운영",
+            "⏰ 24시간 운영": "24시간 운영",
+            "🪙 반려동물 추가 요금 없음": "반려동물 추가 요금 없음",
+            "🐈 반려동물 크기 제한 없음": "반려동물 크기 제한 없음",
+        }
         st.markdown("### 🔍 추가 옵션")
-        parking = st.checkbox("🚗 주차 가능", value=st.session_state.selected_parking)
-        open_24h = st.checkbox("⏰ 24시간 운영", value=st.session_state.selected_24h)
-        pet_friendly = st.checkbox(
-            "🪙 반려동물 추가 요금 없음", value=st.session_state.selected_pet_friendly
-        )
-        all_size = st.checkbox(
-            "🐈 반려동물 크기 제한 없음", value=st.session_state.selected_all_size
-        )
+        selected_values = set(st.session_state.selected_options)
+        for label, key in checkbox_options.items():
+            if st.checkbox(label, value=key in selected_values):
+                selected_values.add(key)  # Add selected option
+            else:
+                selected_values.discard(key)  # Remove unselected option
 
         submitted = st.form_submit_button("🔎 검색하기")
 
         if submitted:
             st.session_state.selected_category = category.split()[1]
-            st.session_state.selected_parking = parking
-            st.session_state.selected_24h = open_24h
-            st.session_state.selected_pet_friendly = pet_friendly
-            st.session_state.selected_all_size = all_size
+            st.session_state.selected_options = list(selected_values)
 
-            # Constructing the query text
-            options = []
-            if st.session_state.selected_parking:
-                options.append("주차 가능")
-            if st.session_state.selected_24h:
-                options.append("24시간 운영")
-            if st.session_state.selected_pet_friendly:
-                options.append("반려동물 추가 요금 없음")
-            if st.session_state.selected_all_size:
-                options.append("반려동물 크기 제한 없음")
-
-            query_text = f"{city} 지역의 {st.session_state.selected_category}{' ('+ ', '.join(options)+ ')' if options else ''}"
+            query_text = f"{city} 지역의 {st.session_state.selected_category}{' ('+ ', '.join(st.session_state.selected_options)+ ')' if st.session_state.selected_options else ''}"
 
             # 검색 버튼
             st.markdown("<br>", unsafe_allow_html=True)
