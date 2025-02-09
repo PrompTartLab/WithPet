@@ -46,7 +46,7 @@ EXAMPLES = [
     },
     {
         "question": "서울 강남구에서 운영시간이 24시간인 동물병원을 알려주세요.",
-        "sql": "SELECT * FROM PET_PLACES WHERE LAND_LOT_ADDRESS LIKE '%서울특별시%강남구%' AND OPERATION_TIME = '00:00~24:00'",
+        "sql": "SELECT * FROM PET_PLACES WHERE LAND_LOT_ADDRESS LIKE '%서울특별시%강남구%' AND OPERATION_TIME LIKE '%00:00~24:00%'",
         "source": "pet_places",
     },
     {
