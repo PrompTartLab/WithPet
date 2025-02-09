@@ -4,10 +4,31 @@ from utils.data_utils import filter_csv_with_sql
 import pandas as pd
 import re
 
+columns = {
+    "pet_places": [
+        "FACILITY_NM",
+        "ROAD_NAME_ADDRESS",
+        "LAND_LOT_ADDRESS",
+        "TEL_NO",
+        "HOMEPAGE_URL",
+        "HOLIDAY_INFORMATION",
+        "OPERATION_TIME",
+        "PARKING_LOT_YN",
+        "USAGE_PRICE",
+        "POSIBLE_PET_SIZE",
+        "PET_LIMIT",
+        "PET_POSSIBLE_AT_INDOOR",
+        "PET_POSSIBLE_AT_OUTDOOR",
+        "FACILITY_INFORMATION",
+        "ADDITIONAL_CHARGE_ON_PET",
+    ]
+}
+
 
 class VerifySQLNode(BaseNode):
     def execute(self, state: GraphState) -> GraphState:
         response = state["sql_response"]
+        data_source = state["data_source"]
 
         match = re.search(r"<SQL>(.*?)</SQL>", response, re.DOTALL)
         if match:
@@ -21,7 +42,9 @@ class VerifySQLNode(BaseNode):
         if isinstance(filtered_data, pd.DataFrame) and not filtered_data.empty:
             return GraphState(
                 sql_status="data exists",
-                filtered_data=filtered_data.head().to_markdown(index=False),
+                filtered_data=filtered_data[columns[data_source]]
+                .head()
+                .to_markdown(index=False),
             )
         else:
             return GraphState(sql_status="no data")
