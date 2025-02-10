@@ -1,9 +1,6 @@
 import streamlit as st
 import os
-from datetime import datetime, timezone
-import requests
-from uuid import uuid4
-import openai
+import time
 
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from models.llm import CHATLLM
@@ -20,39 +17,10 @@ from langchain.callbacks.manager import CallbackManager
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 
 # Langsmith tracing을 위한 키 로드
-LANGSMITH_API_KEY = st.secrets["LANGSMITH_API_KEY"]
-LANGSMITH_PROJECT = st.secrets["LANGSMITH_PROJECT"]
-LANGSMITH_TRACING = "true"
-LANGSMITH_ENDPOINT = "https://api.smith.langchain.com"
-
-# API 헤더 설정
-headers = {"x-api-key": LANGSMITH_API_KEY}
-
-
-def post_run(run_id, name, run_type, inputs, parent_id=None):
-    """Function to post a new run to the API."""
-    data = {
-        "id": run_id.hex,
-        "name": name,
-        "run_type": run_type,
-        "inputs": inputs,
-        "start_time": datetime.utcnow().isoformat(),
-    }
-    if parent_id:
-        data["parent_run_id"] = parent_id.hex
-    requests.post("https://api.smith.langchain.com/runs", json=data, headers=headers)
-
-
-def patch_run(run_id, outputs):
-    """Function to patch a run with outputs."""
-    requests.patch(
-        f"https://api.smith.langchain.com/runs/{run_id}",
-        json={
-            "outputs": outputs,
-            "end_time": datetime.now(timezone.utc).isoformat(),
-        },
-        headers=headers,
-    )
+LANGCHAIN_API_KEY = st.secrets["LANGCHAIN_API_KEY"]
+LANGCHAIN_PROJECT = st.secrets["LANGCHAIN_PROJECT"]
+LANGCHAIN_TRACING_V2 = "true"
+LANGCHAIN_ENDPOINT = "https://api.smith.langchain.com"
 
 
 # 메시지 세션 스테이트 초기화
@@ -117,9 +85,15 @@ def get_embeddings(api_key):
     return OpenAIEmbeddings(openai_api_key=api_key)
 
 
+tracer = LangChainTracer(project_name=LANGCHAIN_PROJECT)
+callback_manager = CallbackManager([tracer])
+
+chat_callback_handler = ChatCallbackHandler()
+
 llm_stream = ChatOpenAI(
     model="gpt-4o",
     streaming=True,
+    callbacks=[chat_callback_handler],
     openai_api_key=OPENAI_API_KEY,
 )
 vectorstore_examples = FAISS.load_local(
@@ -272,38 +246,8 @@ if st.session_state.get("trigger_search", False):
             "⌛질문에 해당하는 장소를 찾고 있습니다... 잠시만 기다려주세요."
         )
 
-    # Create parent run for the entire workflow
-    parent_run_id = uuid4()
-    post_run(
-        parent_run_id,
-        "Tour Guide RAG Pipeline",
-        "chain",
-        {"question": st.session_state.inputs["question"]},
-    )
-
-    # Create child run for the RAG process
-    child_run_id = uuid4()
-    post_run(
-        child_run_id,
-        "RAG Process",
-        "llm",
-        {"inputs": st.session_state.inputs},
-        parent_run_id,
-    )
-
-    # Execute the RAG workflow
     response = app.invoke(st.session_state.inputs)
-
-    # End runs with results
-    patch_run(
-        child_run_id,
-        {
-            "response": response,
-            "data_source": response["data_source"],
-            "sql_status": response["sql_status"],
-        },
-    )
-    patch_run(parent_run_id, {"answer": response["answer"]})
+    print(response["answer"])
 
     if response["data_source"] == "not_relevant" or response["sql_status"] == "no data":
         send_message(response["answer"], "ai", placeholder)
