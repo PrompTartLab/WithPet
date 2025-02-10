@@ -55,8 +55,8 @@ EXAMPLES = [
         "source": "pet_places",
     },
     {
-        "question": "부산에서 토요일에 운영하는 반려동물 미용 시설이 있나요?",
-        "sql": "SELECT * FROM PET_PLACES WHERE LAND_LOT_ADDRESS LIKE '%부산광역시%' AND CATEGORY_NM = '미용' AND OPERATION_TIME LIKE '%토%'",
+        "question": "세종시에서 토요일에 운영하는 반려동물 미용 시설이 있나요?",
+        "sql": "SELECT * FROM PET_PLACES WHERE LAND_LOT_ADDRESS LIKE '%세종특별자치시%' AND CATEGORY_NM = '미용' AND OPERATION_TIME LIKE '%토%'",
         "source": "pet_places",
     },
     {

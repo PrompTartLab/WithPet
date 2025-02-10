@@ -99,5 +99,6 @@ Please provide a detailed and concise answer in Korean.
 Please include useful information like telephone number, homepage url, and full address.
 Format the number with dashes for readability (e.g., 02-1234-5678).
 If the data does not match the question completely, please explain the content of the retrieved data, but notify that it may not match the question.
+Only explain the data included in your answer.
     """,
 )
