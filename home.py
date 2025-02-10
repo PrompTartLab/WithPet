@@ -231,17 +231,8 @@ paint_history()
 
 # Chat Input
 message = st.chat_input("반려동물 동반 시설에 대해 질문해 주세요...")
-# Chat Input
-message = st.chat_input("반려동물 동반 시설에 대해 질문해 주세요...")
 
 if message:
-    st.session_state.inputs = {"question": message}
-    st.session_state.trigger_search = True  # Flag to trigger app invoke
-
-# Process the request if search was triggered
-if st.session_state.get("trigger_search", False):
-    send_message(st.session_state.inputs["question"], "human")
-
     st.session_state.inputs = {"question": message}
     st.session_state.trigger_search = True  # Flag to trigger app invoke
 
