@@ -79,7 +79,6 @@ def paint_history() -> None:
     for msg in st.session_state["messages"]:
         send_message(msg["message"], msg["role"], save=False)
 
-
 @st.cache_resource
 def get_embeddings(api_key):
     return OpenAIEmbeddings(openai_api_key=api_key)
