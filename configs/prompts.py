@@ -96,13 +96,9 @@ From the table with schema:
 Retrieved information is:
 {data}
 Please provide a detailed and concise answer in Korean.
-<<<<<<< HEAD
 Please include useful information like telephone number, homepage url, and full address.
 Format the number with dashes for readability (e.g., 02-1234-5678).
 If the data does not match the question completely, please explain the content of the retrieved data, but notify that it may not match the question.
 Only explain the data included in your answer.
-=======
-If the data does not match the question completely, please explain the content of the retrieved data, but notify that it may not match the question.
->>>>>>> d14289ac2350d050699fdf53e5de3f94c1b2777d
     """,
 )
