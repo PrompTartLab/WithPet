@@ -69,7 +69,6 @@ class SQLWorkflow:
             check_data_source,
             {
                 "pet_places": "get_example",
-                "children_places": "get_example",
                 "not_relevant": "handle_not_relevant",
             },
         )

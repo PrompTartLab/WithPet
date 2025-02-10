@@ -8,6 +8,7 @@ from workflows.sql_workflow import SQLWorkflow
 from configs.examples import EXAMPLES
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain_community.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 from langchain_core.tracers import LangChainTracer
 from langchain.callbacks.manager import CallbackManager
 
@@ -84,19 +85,6 @@ def get_embeddings(api_key):
     return OpenAIEmbeddings(openai_api_key=api_key)
 
 
-@st.cache_resource
-def get_vectorstore_examples(examples, OPENAI_API_KEY):
-    questions = [item["question"] for item in examples]
-    embeddings = get_embeddings(OPENAI_API_KEY)
-    question_embeddings = [
-        (question, embeddings.embed_query(question)) for question in questions
-    ]
-    vectorstore = FAISS.from_embeddings(
-        text_embeddings=question_embeddings, embedding=embeddings, metadatas=examples
-    )
-    return vectorstore
-
-
 tracer = LangChainTracer(project_name=LANGCHAIN_PROJECT)
 callback_manager = CallbackManager([tracer])
 
@@ -108,7 +96,11 @@ llm_stream = ChatOpenAI(
     callbacks=[chat_callback_handler],
     openai_api_key=OPENAI_API_KEY,
 )
-vectorstore_examples = get_vectorstore_examples(EXAMPLES, OPENAI_API_KEY)
+vectorstore_examples = FAISS.load_local(
+    "faiss_example",
+    get_embeddings(OPENAI_API_KEY),
+    allow_dangerous_deserialization=True,
+)
 tour_rag = SQLWorkflow(CHATLLM, llm_stream, vectorstore_examples)
 app = tour_rag.setup_workflow()
 
@@ -124,7 +116,7 @@ st.markdown(
 
 st.markdown(
     """
-    <p style="text-align: center; font-size: 18px; color: #555;">
+    <p style="text-align: center; font-size: 18px; color: #555; font-weight: bold;">
         반려동물과 함께 할 수 있는 장소를 찾아보세요! 🐶🐱
     </p>
     """,
@@ -141,10 +133,20 @@ st.markdown(
     ">
         <h5 style="color: #FF6B00;">💡 이용 가능한 질문 예시</h5>
         <ul style="font-size: 16px; color: #333;">
-            <li>🏥 <b>종로구</b>에 있는 <b>24시간 동물병원</b>을 알려주세요.</li>
+            <li>🏥 <b>강남구 신사동</b>에 <b>일요일</b>에도 영업하는 동물병원</b>이 있나요?</li>
+            <li>☕ <b>부산 동구</b>에 <b>주차 가능한</b> <b>카페</b> 알려줘.</li>
             <li>🏡 <b>인천</b>에 있는 <b>반려동물 추가 요금 없는 펜션</b>을 찾아주세요.</li>
-            <li>☕ <b>부산 동구</b>에 있는 <b>주차 가능한 카페</b>가 있나요?</li>
         </ul>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+st.markdown(
+    """
+    <div>
+        <p style="font-size: 14px; color: #666; text-align: center; margin-top: 15px;">
+            <i>※ 해당 챗봇이 제공하는 모든 시설은 반려동물 동반 가능 시설입니다.</i>
+        </p>
     </div>
     """,
     unsafe_allow_html=True,
@@ -155,16 +157,10 @@ st.markdown("<br><br>", unsafe_allow_html=True)
 # Initialize session state for user selections
 if "selected_category" not in st.session_state:
     st.session_state.selected_category = "카페"
-if "selected_parking" not in st.session_state:
-    st.session_state.selected_parking = False
-if "selected_24h" not in st.session_state:
-    st.session_state.selected_24h = False
-if "selected_dedicated" not in st.session_state:
-    st.session_state.selected_dedicated = False
-if "selected_pet_friendly" not in st.session_state:
-    st.session_state.selected_pet_friendly = False
-if "selected_all_size" not in st.session_state:
-    st.session_state.selected_all_size = False
+
+# Initialize session state list for selected options
+if "selected_options" not in st.session_state:
+    st.session_state.selected_options = []
 
 # Sidebar Design
 with st.sidebar:
@@ -174,7 +170,7 @@ with st.sidebar:
         st.markdown("### 📍 지역을 선택하세요")
         city = st.selectbox(
             "지역 선택",
-            ["서울", "부산", "인천", "대구", "대전", "광주", "울산", "제주"],
+            ["서울", "부산", "인천", "대구", "대전", "광주", "울산", "세종", "제주"],
             label_visibility="collapsed",
         )
         st.markdown("### 🏠 시설 유형")
@@ -182,20 +178,20 @@ with st.sidebar:
             "시설 유형",  # Empty label to remove space
             [
                 "☕ 카페",
-                "🍽️ 식당",
                 "🏡 펜션",
                 "🏨 호텔",
                 "🏥 동물병원",
+                "💊 동물약국",
                 "✂️ 미용",
                 "🛒 반려동물용품",
                 "🏢 위탁관리",
             ],
             index=[
                 "카페",
-                "식당",
                 "펜션",
                 "호텔",
                 "동물병원",
+                "동물약국",
                 "미용",
                 "반려동물용품",
                 "위탁관리",
@@ -203,43 +199,28 @@ with st.sidebar:
             label_visibility="collapsed",
         )
 
+        checkbox_options = {
+            "🚗 주차 가능": "주차 가능",
+            "🗓️ 주말 운영": "주말 운영",
+            "⏰ 24시간 운영": "24시간 운영",
+            "🪙 반려동물 추가 요금 없음": "반려동물 추가 요금 없음",
+            "🐈 반려동물 크기 제한 없음": "반려동물 크기 제한 없음",
+        }
         st.markdown("### 🔍 추가 옵션")
-        parking = st.checkbox("🚗 주차 가능", value=st.session_state.selected_parking)
-        open_24h = st.checkbox("⏰ 24시간 운영", value=st.session_state.selected_24h)
-        dedicated = st.checkbox(
-            "🐾 반려동물 전용 시설", value=st.session_state.selected_dedicated
-        )
-        pet_friendly = st.checkbox(
-            "🐕 반려동물 추가 요금 없음", value=st.session_state.selected_pet_friendly
-        )
-        all_size = st.checkbox(
-            "🐈 반려동물 크기 제한 없음", value=st.session_state.selected_all_size
-        )
+        selected_values = set(st.session_state.selected_options)
+        for label, key in checkbox_options.items():
+            if st.checkbox(label, value=key in selected_values):
+                selected_values.add(key)  # Add selected option
+            else:
+                selected_values.discard(key)  # Remove unselected option
 
         submitted = st.form_submit_button("🔎 검색하기")
 
         if submitted:
-            st.session_state.selected_category = category[2:]
-            st.session_state.selected_parking = parking
-            st.session_state.selected_24h = open_24h
-            st.session_state.selected_dedicated = dedicated
-            st.session_state.selected_pet_friendly = pet_friendly
-            st.session_state.selected_all_size = all_size
+            st.session_state.selected_category = category.split()[1]
+            st.session_state.selected_options = list(selected_values)
 
-            # Constructing the query text
-            options = []
-            if st.session_state.selected_parking:
-                options.append("주차 가능")
-            if st.session_state.selected_24h:
-                options.append("24시간 운영")
-            if st.session_state.selected_dedicated:
-                options.append("반려동물 전용 시설")
-            if st.session_state.selected_pet_friendly:
-                options.append("반려동물 추가 요금 없음")
-            if st.session_state.selected_all_size:
-                options.append("반려동물 크기 제한 없음")
-
-            query_text = f"{city} 지역의 {st.session_state.selected_category}{' ('+ ', '.join(options)+ ')' if options else ''}"
+            query_text = f"{city} 지역의 {st.session_state.selected_category}{' ('+ ', '.join(st.session_state.selected_options)+ ')' if st.session_state.selected_options else ''}"
 
             # 검색 버튼
             st.markdown("<br>", unsafe_allow_html=True)
@@ -250,8 +231,17 @@ paint_history()
 
 # Chat Input
 message = st.chat_input("반려동물 동반 시설에 대해 질문해 주세요...")
+# Chat Input
+message = st.chat_input("반려동물 동반 시설에 대해 질문해 주세요...")
 
 if message:
+    st.session_state.inputs = {"question": message}
+    st.session_state.trigger_search = True  # Flag to trigger app invoke
+
+# Process the request if search was triggered
+if st.session_state.get("trigger_search", False):
+    send_message(st.session_state.inputs["question"], "human")
+
     st.session_state.inputs = {"question": message}
     st.session_state.trigger_search = True  # Flag to trigger app invoke
 

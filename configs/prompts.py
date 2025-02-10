@@ -25,11 +25,15 @@ You are an expert in generating SQL queries. Your task is to create SQL queries 
 
 You must follow these rules:
 ### Rules for SQL Generation:
-1. Identify relevant columns in the schema that correspond to the conditions in the user's query.
-2. If a part of the query has no directly corresponding column, do not add unnecessary filters. Instead, retrieve all data (e.g., `SELECT * FROM {data_source}`).
-3. Only include columns in the `WHERE` clause if they are directly related to the query. Do not add assumptions or irrelevant filters.
-4. Ensure each column matches the schema of the data source.
-5. Answer the sql only between <SQL> </SQL> tag.
+1. **Match Columns to Conditions**: Identify relevant columns in the schema that correspond to the conditions in the user's query. Use only columns specified in the schema.
+2. **Avoid Unnecessary Filters**: If part of the query has no directly corresponding column, do not add assumptions or irrelevant filters. Instead, retrieve all data using `SELECT * FROM {data_source}`.
+3. **Include Only Relevant Columns in WHERE Clause**: Only include columns in the `WHERE` clause that are directly related to the query. Do not infer conditions beyond what is explicitly asked in the query.
+4. **Filter Days with Specific Rules**: 
+   - For filtering days, use LIKE operation on the relevant column to match specific days:
+     - Saturday: `DAYTIME_COLUMN LIKE "%토%"`
+     - Sunday: `DAYTIME_COLUMN LIKE "%일요일%"`
+5. **Ensure Schema Accuracy**: Always ensure the column names in the query match those defined in the schema exactly.
+6. **SQL Tagging**: Wrap the generated SQL query between `<SQL>` and `</SQL>` tags to clearly separate it from other content.
 
 In a prior turn, you have predicted a SQL, which returned no results. Your job now is to generate a new SQL to try again.
 In general, you should try to RELAX constraints.
@@ -58,11 +62,16 @@ SQL_GENERATION_TEMPLATE = PromptTemplate(
 You are an expert in generating SQL queries. Your task is to create SQL queries based on the user's question and the provided schema. You must follow these rules:
 
 ### Rules for SQL Generation:
-1. Identify relevant columns in the schema that correspond to the conditions in the user's query.
-2. If a part of the query has no directly corresponding column, do not add unnecessary filters. Instead, retrieve all data (e.g., `SELECT * FROM {data_source}`).
-3. Only include columns in the `WHERE` clause if they are directly related to the query. Do not add assumptions or irrelevant filters.
-4. Ensure each column matches the schema of the data source.
-5. Answer the sql only between <SQL> </SQL> tag.
+1. **Match Columns to Conditions**: Identify relevant columns in the schema that correspond to the conditions in the user's query. Use only columns specified in the schema.
+2. **Avoid Unnecessary Filters**: If part of the query has no directly corresponding column, do not add assumptions or irrelevant filters. Instead, retrieve all data using `SELECT * FROM {data_source}`.
+3. **Include Only Relevant Columns in WHERE Clause**: Only include columns in the `WHERE` clause that are directly related to the query. Do not infer conditions beyond what is explicitly asked in the query.
+4. **Filter Days with Specific Rules**: 
+   - For filtering days, use LIKE operation on the relevant column to match specific days:
+     - Saturday: `DAYTIME_COLUMN LIKE "%토%"`
+     - Sunday: `DAYTIME_COLUMN LIKE "%일요일%"`
+5. **Ensure Schema Accuracy**: Always ensure the column names in the query match those defined in the schema exactly.
+6. **SQL Tagging**: Wrap the generated SQL query between `<SQL>` and `</SQL>` tags to clearly separate it from other content.
+
 
 Table schema: {schema}
 External knowledge:{external_knowledge}
@@ -87,6 +96,9 @@ From the table with schema:
 Retrieved information is:
 {data}
 Please provide a detailed and concise answer in Korean.
+Please include useful information like telephone number, homepage url, and full address.
+Format the number with dashes for readability (e.g., 02-1234-5678).
 If the data does not match the question completely, please explain the content of the retrieved data, but notify that it may not match the question.
+Only explain the data included in your answer.
     """,
 )

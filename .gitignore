@@ -1,5 +1,5 @@
 # folder
-.streamlit/
+.streamlit/secrets.toml
 *.pyc
 
 # file
