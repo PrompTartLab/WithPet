@@ -10,15 +10,30 @@ class SelectDataNode(BaseNode):
         chatllm = self.context.llm
         question = state["question"]
 
-        structured_llm = chatllm.with_structured_output(RouteQuery)
+        inputs = {"question": question}
 
-        prompt = ChatPromptTemplate.from_messages(
-            [("system", SOURCE_ROUTING_PROMPT), ("human", "{question}")]
+        # tracer가 있는 경우 직접 추적 시작
+        node_run_id = (
+            self._trace_node(inputs, SOURCE_ROUTING_PROMPT) if self.tracer else None
         )
 
-        # Define router
-        router = prompt | structured_llm
+        try:
+            structured_llm = chatllm.with_structured_output(RouteQuery)
+            prompt = ChatPromptTemplate.from_messages(
+                [("system", SOURCE_ROUTING_PROMPT), ("human", "{question}")]
+            )
+            router = prompt | structured_llm
+            response = router.invoke(question)
 
-        response = router.invoke(question)
-        print(response.datasource)
-        return GraphState(data_source=response.datasource)
+            result = GraphState(data_source=response.datasource)
+
+            # 결과 추적 기록
+            if node_run_id:
+                self._end_trace(node_run_id, {"result": result})
+
+            return result
+
+        except Exception as e:
+            if node_run_id:
+                self._end_trace(node_run_id, {"error": str(e)}, status="error")
+            raise e

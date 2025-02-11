@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import time
+from uuid import uuid4
 
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from models.llm import CHATLLM
@@ -9,19 +10,22 @@ from configs.examples import EXAMPLES
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain_community.vectorstores import FAISS
 from langchain_community.vectorstores import FAISS
+
 from langchain_core.tracers import LangChainTracer
 from langchain.callbacks.manager import CallbackManager
+from utils.tracer import TracingManager
 
 
 # OpenAI API 키 로드
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 
 # Langsmith tracing을 위한 키 로드
-LANGCHAIN_API_KEY = st.secrets["LANGCHAIN_API_KEY"]
-LANGCHAIN_PROJECT = st.secrets["LANGCHAIN_PROJECT"]
-LANGCHAIN_TRACING_V2 = "true"
-LANGCHAIN_ENDPOINT = "https://api.smith.langchain.com"
+LANGSMITH_API_KEY = st.secrets["LANGSMITH_API_KEY"]
+LANGSMITH_PROJECT = st.secrets["LANGSMITH_PROJECT"]
+LANGSMITH_TRACING = "true"
+LANGSMITH_ENDPOINT = "https://api.smith.langchain.com"
 
+tracer = TracingManager(LANGSMITH_API_KEY)
 
 # 메시지 세션 스테이트 초기화
 if "messages" not in st.session_state:
@@ -69,9 +73,8 @@ def send_message(message: str, role: str, save: bool = True, placeholder=None) -
     else:
         with st.chat_message(role):
             st.markdown(message)  # Normal UI message if no placeholder
-
-    if save:
-        save_message(message, role)
+            if save:
+                save_message(message, role)
 
 
 def paint_history() -> None:
@@ -79,20 +82,15 @@ def paint_history() -> None:
     for msg in st.session_state["messages"]:
         send_message(msg["message"], msg["role"], save=False)
 
+
 @st.cache_resource
 def get_embeddings(api_key):
     return OpenAIEmbeddings(openai_api_key=api_key)
 
 
-tracer = LangChainTracer(project_name=LANGCHAIN_PROJECT)
-callback_manager = CallbackManager([tracer])
-
-chat_callback_handler = ChatCallbackHandler()
-
 llm_stream = ChatOpenAI(
     model="gpt-4o",
     streaming=True,
-    callbacks=[chat_callback_handler],
     openai_api_key=OPENAI_API_KEY,
 )
 vectorstore_examples = FAISS.load_local(
@@ -100,7 +98,8 @@ vectorstore_examples = FAISS.load_local(
     get_embeddings(OPENAI_API_KEY),
     allow_dangerous_deserialization=True,
 )
-tour_rag = SQLWorkflow(CHATLLM, llm_stream, vectorstore_examples)
+
+tour_rag = SQLWorkflow(CHATLLM, llm_stream, vectorstore_examples, tracer=tracer)
 app = tour_rag.setup_workflow()
 
 
@@ -163,7 +162,6 @@ if "selected_options" not in st.session_state:
 
 # Sidebar Design
 with st.sidebar:
-
     # Use `st.form` to prevent auto-rerun for filters
     with st.form("filter_form"):
         st.markdown("### 📍 지역을 선택하세요")
@@ -235,6 +233,11 @@ if message:
     st.session_state.inputs = {"question": message}
     st.session_state.trigger_search = True  # Flag to trigger app invoke
 
+    # Create parent run for tracing
+    workflow_run_id = tracer.start_workflow_run(
+        "Tour Guide RAG Pipeline", {"question": message}
+    )
+
 # Process the request if search was triggered
 if st.session_state.get("trigger_search", False):
     send_message(st.session_state.inputs["question"], "human")
@@ -249,7 +252,14 @@ if st.session_state.get("trigger_search", False):
     print(response["answer"])
 
     if response["data_source"] == "not_relevant" or response["sql_status"] == "no data":
-        send_message(response["answer"], "ai", placeholder)
+        placeholder.markdown(response["answer"])  # 플레이스홀더만 업데이트
+    else:
+        with st.chat_message("ai"):  # 새로운 메시지로 표시
+            st.markdown(response["answer"])
+            save_message(response["answer"], "ai")
+
+    # End parent run for tracing
+    tracer.end_run(workflow_run_id, {"answer": response["answer"]})
 
     # Reset trigger after processing
     st.session_state.trigger_search = False
