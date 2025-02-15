@@ -13,6 +13,18 @@ class GenerateSQLNode(BaseNode):
         examples = state["examples"]
         schema = SCHEMAS.get(data_source, {})
 
+        inputs = {
+            "question": question,
+            "data_source": data_source,
+            "examples": examples,
+            "schema": schema,
+        }
+
+        # tracer가 있는 경우 직접 추적 시작
+        node_run_id = (
+            self._trace_node(inputs, SQL_GENERATION_TEMPLATE) if self.tracer else None
+        )
+
         sql_chain = SQL_GENERATION_TEMPLATE | chatllm
         response = sql_chain.invoke(
             {
@@ -25,4 +37,10 @@ class GenerateSQLNode(BaseNode):
         )
 
         print("\n", response.content)
-        return GraphState(schema=schema, sql_response=response.content)
+        result = GraphState(schema=schema, sql_response=response.content)
+
+        # 결과 추적 기록
+        if node_run_id:
+            self._end_trace(node_run_id, {"result": result})
+
+        return result
