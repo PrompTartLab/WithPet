@@ -252,7 +252,9 @@ if st.session_state.get("trigger_search", False):
     # 로딩 메시지 표시
     with st.chat_message("ai"):
         placeholder = st.empty()
-        placeholder.markdown("⌛질문에 해당하는 장소를 찾고 있습니다... 잠시만 기다려주세요.")
+        placeholder.markdown(
+            "⌛질문에 해당하는 장소를 찾고 있습니다... 잠시만 기다려주세요."
+        )
         response = app.invoke(st.session_state.inputs)
         print(response["answer"])
 
