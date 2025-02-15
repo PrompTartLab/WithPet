@@ -27,7 +27,7 @@ LANGCHAIN_ENDPOINT = "https://api.smith.langchain.com"
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
 
-st.set_page_config(page_title="반려동물 시설 가이드", page_icon="🐕")
+st.set_page_config(page_title="WithPet", page_icon="🐕")
 
 
 class ChatCallbackHandler(BaseCallbackHandler):
@@ -108,7 +108,7 @@ app = tour_rag.setup_workflow()
 st.markdown(
     """
     <h2 style='text-align: center; color: #FF914D;'>
-        🐾 반려동물 동반 시설 가이드 🐾
+        🐾 WithPet: 반려동물 동반 시설 가이드 🐾
     </h2>
     """,
     unsafe_allow_html=True,
@@ -133,9 +133,9 @@ st.markdown(
     ">
         <h5 style="color: #FF6B00;">💡 이용 가능한 질문 예시</h5>
         <ul style="font-size: 16px; color: #333;">
-            <li>🏥 <b>강남구 신사동</b>에 <b>일요일</b>에도 영업하는 동물병원</b>이 있나요?</li>
-            <li>☕ <b>부산 동구</b>에 <b>주차 가능한</b> <b>카페</b> 알려줘.</li>
-            <li>🏡 <b>인천</b>에 있는 <b>반려동물 추가 요금 없는 펜션</b>을 찾아주세요.</li>
+            <li>🏥 <b>강남구 신사동</b>에 <b>일요일</b>에도 영업하는 <b>동물병원</b>이 있나요?</li>
+            <li>☕ <b>부산 동구</b>에 <b>주차 가능한</b> <b>카페</b>를 알려주세요.</li>
+            <li>🏡 <b>인천</b>에 있는 <b>반려동물 추가 요금 없는 펜션</b> 찾아줘.</li>
         </ul>
     </div>
     """,
@@ -148,10 +148,10 @@ st.markdown(
             <i>※ 해당 챗봇이 제공하는 모든 시설은 반려동물 동반 가능 시설입니다.</i>
         </p>
     </div>
+    <br>
     """,
     unsafe_allow_html=True,
 )
-st.markdown("<br><br>", unsafe_allow_html=True)
 
 
 # Initialize session state for user selections
@@ -167,7 +167,21 @@ with st.sidebar:
 
     # Use `st.form` to prevent auto-rerun for filters
     with st.form("filter_form"):
-        st.markdown("### 📍 지역을 선택하세요")
+        st.markdown(
+            """
+            <h1 style="display: flex; justify-content: center; align-items: center;">
+                🚀 Quick Search 
+                <span style="font-size: 12px; vertical-align: sub; margin-left: 8px; cursor: pointer;" 
+                    title="지역과 시설 유형을 선택한 후 검색하기를 클릭하세요.">
+                    ℹ️
+                </span>
+            </h1>
+            <br>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        st.markdown("### 📍 지역")
         city = st.selectbox(
             "지역 선택",
             ["서울", "부산", "인천", "대구", "대전", "광주", "울산", "세종", "제주"],
@@ -214,6 +228,7 @@ with st.sidebar:
             else:
                 selected_values.discard(key)  # Remove unselected option
 
+        st.markdown("<br>", unsafe_allow_html=True)
         submitted = st.form_submit_button("🔎 검색하기")
 
         if submitted:
