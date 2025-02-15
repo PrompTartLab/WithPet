@@ -25,7 +25,7 @@ class SQLWorkflow:
     내부적으로 SQLite를 사용하여 CSV 데이터를 관리한다.
     """
 
-    def __init__(self, llm_chat, llm_stream, vector_store_example, tracer=None):
+    def __init__(self, llm_chat, llm_stream, vector_store_example):
         """
         Args:
             llm_chat: 모델 function call(Structured LLM)을 활용할 수 있는 LLM (ex. ChatOpenAI)
@@ -40,17 +40,16 @@ class SQLWorkflow:
             llm_chat, llm_stream, self.conn, vector_store_example, None
         )
         self.app = None
-        self.tracer = tracer
 
     def setup_workflow(self):
-        select_data_node = SelectDataNode(self.context, self.tracer)
-        get_example_node = GetExampleNode(self.context, self.tracer)
-        generate_sql_node = GenerateSQLNode(self.context, self.tracer)
-        verify_sql_node = VerifySQLNode(self.context, self.tracer)
-        web_search_node = WebSearchNode(self.context, self.tracer)
-        generate_answer_node = GenerateAnswerNode(self.context, self.tracer)
-        handle_no_data_node = HandleNoDataNode(self.context, self.tracer)
-        handle_not_relevant_node = HandleNotRelevantNode(self.context, self.tracer)
+        select_data_node = SelectDataNode(self.context)
+        get_example_node = GetExampleNode(self.context)
+        generate_sql_node = GenerateSQLNode(self.context)
+        verify_sql_node = VerifySQLNode(self.context)
+        web_search_node = WebSearchNode(self.context)
+        generate_answer_node = GenerateAnswerNode(self.context)
+        handle_no_data_node = HandleNoDataNode(self.context)
+        handle_not_relevant_node = HandleNotRelevantNode(self.context)
 
         self.workflow.add_node("select_data_source", select_data_node.execute)
         self.workflow.add_node("get_example", get_example_node.execute)
@@ -96,13 +95,7 @@ class SQLRAGWorkflow:
     """
 
     def __init__(
-        self,
-        llm_chat,
-        llm_stream,
-        conn,
-        vector_store_example,
-        vector_store_data,
-        tracer=None,
+        self, llm_chat, llm_stream, conn, vector_store_example, vector_store_data
     ):
         """
         Args:
@@ -116,17 +109,16 @@ class SQLRAGWorkflow:
             llm_chat, llm_stream, conn, vector_store_example, vector_store_data
         )
         self.app = None
-        self.tracer = tracer
 
     def setup_workflow(self):
-        select_data_node = SelectDataNode(self.context, self.tracer)
-        get_example_node = GetExampleNode(self.context, self.tracer)
-        generate_sql_node = GenerateSQLNode(self.context, self.tracer)
-        execute_sql_node = ExecuteSQLNode(self.context, self.tracer)
-        perform_rag_node = PerformRAGNode(self.context, self.tracer)
-        web_search_node = WebSearchNode(self.context, self.tracer)
-        generate_answer_node = GenerateAnswerNode(self.context, self.tracer)
-        handle_no_data_node = HandleNoDataNode(self.context, self.tracer)
+        select_data_node = SelectDataNode(self.context)
+        get_example_node = GetExampleNode(self.context)
+        generate_sql_node = GenerateSQLNode(self.context)
+        execute_sql_node = ExecuteSQLNode(self.context)
+        perform_rag_node = PerformRAGNode(self.context)
+        web_search_node = WebSearchNode(self.context)
+        generate_answer_node = GenerateAnswerNode(self.context)
+        handle_no_data_node = HandleNoDataNode(self.context)
 
         # 노드 추가
         self.workflow.add_node("select_data_source", select_data_node.execute)

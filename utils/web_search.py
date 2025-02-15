@@ -6,6 +6,7 @@ from langchain_community.utilities import SerpAPIWrapper
 
 
 def web_search(template: str, serpapi_params: Dict[str, str], query: str, llm) -> str:
+
     prompt = PromptTemplate(
         template=template,
         input_variables=["query"],
