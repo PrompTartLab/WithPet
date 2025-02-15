@@ -20,11 +20,11 @@ from utils.tracer import TracingManager
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 
 # Langsmith tracing을 위한 키 로드
-os.environ["LANGSMITH_API_KEY"] = st.secrets["LANGSMITH_API_KEY"]
-os.environ["LANGSMITH_TRACING"] = "true"
-os.environ["LANGSMITH_ENDPOINT"] = "https://api.smith.langchain.com"
+LANGSMITH_API_KEY = st.secrets["LANGSMITH_API_KEY"]
+LANGSMITH_PROJECT = st.secrets["LANGSMITH_PROJECT"]
+LANGSMITH_TRACING = "true"
 
-tracer = TracingManager(os.environ["LANGSMITH_API_KEY"], "TourGuideRAG")
+tracer = TracingManager(LANGSMITH_API_KEY, LANGSMITH_PROJECT)
 
 # 메시지 세션 스테이트 초기화
 if "messages" not in st.session_state:
@@ -87,12 +87,9 @@ def get_embeddings(api_key):
     return OpenAIEmbeddings(openai_api_key=api_key)
 
 
-chat_callback_handler = ChatCallbackHandler()
-
 llm_stream = ChatOpenAI(
     model="gpt-4o",
     streaming=True,
-    callbacks=[chat_callback_handler],
     openai_api_key=OPENAI_API_KEY,
 )
 vectorstore_examples = FAISS.load_local(
@@ -237,7 +234,7 @@ if message:
 
     # Create parent run for tracing
     workflow_run_id = tracer.start_workflow_run(
-        "Tour Guide RAG Pipeline", {"question": st.session_state.inputs}
+        "Tour Guide RAG Pipeline", {"question": message}
     )
 
 # Process the request if search was triggered
@@ -255,18 +252,20 @@ if st.session_state.get("trigger_search", False):
         placeholder.markdown(
             "⌛질문에 해당하는 장소를 찾고 있습니다... 잠시만 기다려주세요."
         )
-        response = app.invoke(st.session_state.inputs)
-        print(response["answer"])
 
     try:
+        # 응답 생성
+        response = app.invoke(st.session_state.inputs)
+
+        # 응답이 있는 경우 메시지 전송
         if response.get("answer"):
             if (
                 response["data_source"] == "not_relevant"
                 or response["sql_status"] == "no data"
             ):
-                send_message(response["answer"], "ai", placeholder)
+                send_message(response["answer"], "ai", placeholder=placeholder)
             else:
-                send_message(response["answer"], "ai", placeholder)
+                send_message(response["answer"], "ai", placeholder=placeholder)
 
     except Exception as e:
         # 예외 발생 시 에러 메시지 표시

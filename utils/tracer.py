@@ -57,7 +57,7 @@ class TracingManager:
             "name": name,
             "run_type": run_type,
             "inputs": inputs,
-            "start_time": datetime.now(timezone.utc).isoformat(),
+            "start_time": datetime.utcnow().isoformat(),
             "project": self.project,
         }
         if parent_id:
