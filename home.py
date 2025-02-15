@@ -154,7 +154,6 @@ if "selected_options" not in st.session_state:
 
 # Sidebar Design
 with st.sidebar:
-
     # Use `st.form` to prevent auto-rerun for filters
     with st.form("filter_form"):
         st.markdown("### 📍 지역을 선택하세요")
@@ -232,9 +231,7 @@ if st.session_state.get("trigger_search", False):
 
     with st.chat_message("ai"):
         placeholder = st.empty()
-        placeholder.markdown(
-            "⌛질문에 해당하는 장소를 찾고 있습니다... 잠시만 기다려주세요."
-        )
+        placeholder.markdown("⌛질문에 해당하는 장소를 찾고 있습니다... 잠시만 기다려주세요.")
 
     response = app.invoke(st.session_state.inputs)
     print(response["answer"])
