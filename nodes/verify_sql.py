@@ -40,9 +40,14 @@ class VerifySQLNode(BaseNode):
         print("Data Length: ", len(filtered_data))
 
         if isinstance(filtered_data, pd.DataFrame) and not filtered_data.empty:
+            columns_to_show = [
+                column
+                for column in filtered_data.columns
+                if column in columns[data_source]
+            ]
             return GraphState(
                 sql_status="data exists",
-                filtered_data=filtered_data[columns[data_source]]
+                filtered_data=filtered_data[columns_to_show]
                 .head()
                 .to_markdown(index=False),
             )
