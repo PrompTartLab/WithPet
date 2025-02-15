@@ -27,29 +27,23 @@ class GenerateAnswerNode(BaseNode):
             else None
         )
 
-        try:
-            chain = ANSWER_GENERATION_TEMPLATE | chatllm
-            final_answer = chain.invoke(
-                {
-                    "question": question,
-                    "schema": schema,
-                    "data": data,
-                }
-            )
-            answer = final_answer if type(final_answer) == str else final_answer.content
+        chain = ANSWER_GENERATION_TEMPLATE | chatllm
+        final_answer = chain.invoke(
+            {
+                "question": question,
+                "schema": schema,
+                "data": data,
+            }
+        )
+        answer = final_answer if type(final_answer) == str else final_answer.content
 
-            result = GraphState(answer=answer)
+        result = GraphState(answer=answer)
 
-            # 결과 추적 기록
-            if node_run_id:
-                self._end_trace(node_run_id, {"result": result})
+        # 결과 추적 기록
+        if node_run_id:
+            self._end_trace(node_run_id, {"result": result})
 
-            return result
-
-        except Exception as e:
-            if node_run_id:
-                self._end_trace(node_run_id, {"error": str(e)}, status="error")
-            raise e
+        return result
 
 
 class HandleNotRelevantNode(BaseNode):

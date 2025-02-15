@@ -25,28 +25,22 @@ class GenerateSQLNode(BaseNode):
             self._trace_node(inputs, SQL_GENERATION_TEMPLATE) if self.tracer else None
         )
 
-        try:
-            sql_chain = SQL_GENERATION_TEMPLATE | chatllm
-            response = sql_chain.invoke(
-                {
-                    "question": question,
-                    "data_source": data_source,
-                    "examples": examples,
-                    "schema": schema,
-                    "external_knowledge": "",
-                }
-            )
+        sql_chain = SQL_GENERATION_TEMPLATE | chatllm
+        response = sql_chain.invoke(
+            {
+                "question": question,
+                "data_source": data_source,
+                "examples": examples,
+                "schema": schema,
+                "external_knowledge": "",
+            }
+        )
 
-            print("\n", response.content)
-            result = GraphState(schema=schema, sql_response=response.content)
+        print("\n", response.content)
+        result = GraphState(schema=schema, sql_response=response.content)
 
-            # 결과 추적 기록
-            if node_run_id:
-                self._end_trace(node_run_id, {"result": result})
+        # 결과 추적 기록
+        if node_run_id:
+            self._end_trace(node_run_id, {"result": result})
 
-            return result
-
-        except Exception as e:
-            if node_run_id:
-                self._end_trace(node_run_id, {"error": str(e)}, status="error")
-            raise e
+        return result
