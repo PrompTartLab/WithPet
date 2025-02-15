@@ -7,11 +7,6 @@ class GetExampleNode(BaseNode):
         data_source = state["data_source"]
         question = state["question"]
 
-        inputs = {"data_source": data_source, "question": question}
-
-        # tracer가 있는 경우 직접 추적 시작
-        node_run_id = self._trace_node(inputs) if self.tracer else None
-
         examples_topk = self.context.vs_example.similarity_search(
             question, k=10, filter={"source": data_source}
         )
@@ -22,10 +17,4 @@ class GetExampleNode(BaseNode):
             ]
         )
         print(examples_format)
-        result = GraphState(examples=examples_format)
-
-        # 결과 추적 기록
-        if node_run_id:
-            self._end_trace(node_run_id, {"result": result})
-
-        return result
+        return GraphState(examples=examples_format)

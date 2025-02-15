@@ -17,6 +17,20 @@ from nodes.routing import check_data_source, check_sql_status
 
 from utils.data_utils import load_csv_to_sqlite
 
+import streamlit as st
+from langsmith import traceable
+import os
+
+# Langsmith tracing을 위한 키 로드
+if "LANGSMITH_PROJECT" not in st.session_state:
+    st.session_state["LANGSMITH_PROJECT"] = st.secrets["LANGSMITH_PROJECT"]
+    os.environ["LANGSMITH_PROJECT"] = st.session_state["LANGSMITH_PROJECT"]
+os.environ["LANGSMITH_TRACING"] = "true"
+os.environ["LANGSMITH_ENDPOINT"] = "https://api.smith.langchain.com"
+
+# 환경 변수가 제대로 설정되었는지 확인
+print(os.environ.get("LANGSMITH_PROJECT"))
+
 
 class SQLWorkflow:
     """
@@ -40,17 +54,16 @@ class SQLWorkflow:
             llm_chat, llm_stream, self.conn, vector_store_example, None
         )
         self.app = None
-        self.tracer = tracer
 
     def setup_workflow(self):
-        select_data_node = SelectDataNode(self.context, self.tracer)
-        get_example_node = GetExampleNode(self.context, self.tracer)
-        generate_sql_node = GenerateSQLNode(self.context, self.tracer)
-        verify_sql_node = VerifySQLNode(self.context, self.tracer)
-        web_search_node = WebSearchNode(self.context, self.tracer)
-        generate_answer_node = GenerateAnswerNode(self.context, self.tracer)
-        handle_no_data_node = HandleNoDataNode(self.context, self.tracer)
-        handle_not_relevant_node = HandleNotRelevantNode(self.context, self.tracer)
+        select_data_node = SelectDataNode(self.context)
+        get_example_node = GetExampleNode(self.context)
+        generate_sql_node = GenerateSQLNode(self.context)
+        verify_sql_node = VerifySQLNode(self.context)
+        web_search_node = WebSearchNode(self.context)
+        generate_answer_node = GenerateAnswerNode(self.context)
+        handle_no_data_node = HandleNoDataNode(self.context)
+        handle_not_relevant_node = HandleNotRelevantNode(self.context)
 
         self.workflow.add_node("select_data_source", select_data_node.execute)
         self.workflow.add_node("get_example", get_example_node.execute)
@@ -102,7 +115,6 @@ class SQLRAGWorkflow:
         conn,
         vector_store_example,
         vector_store_data,
-        tracer=None,
     ):
         """
         Args:
@@ -116,17 +128,16 @@ class SQLRAGWorkflow:
             llm_chat, llm_stream, conn, vector_store_example, vector_store_data
         )
         self.app = None
-        self.tracer = tracer
 
     def setup_workflow(self):
-        select_data_node = SelectDataNode(self.context, self.tracer)
-        get_example_node = GetExampleNode(self.context, self.tracer)
-        generate_sql_node = GenerateSQLNode(self.context, self.tracer)
-        execute_sql_node = ExecuteSQLNode(self.context, self.tracer)
-        perform_rag_node = PerformRAGNode(self.context, self.tracer)
-        web_search_node = WebSearchNode(self.context, self.tracer)
-        generate_answer_node = GenerateAnswerNode(self.context, self.tracer)
-        handle_no_data_node = HandleNoDataNode(self.context, self.tracer)
+        select_data_node = SelectDataNode(self.context)
+        get_example_node = GetExampleNode(self.context)
+        generate_sql_node = GenerateSQLNode(self.context)
+        execute_sql_node = ExecuteSQLNode(self.context)
+        perform_rag_node = PerformRAGNode(self.context)
+        web_search_node = WebSearchNode(self.context)
+        generate_answer_node = GenerateAnswerNode(self.context)
+        handle_no_data_node = HandleNoDataNode(self.context)
 
         # 노드 추가
         self.workflow.add_node("select_data_source", select_data_node.execute)
