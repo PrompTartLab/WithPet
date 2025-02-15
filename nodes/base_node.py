@@ -1,7 +1,4 @@
 from typing import Dict, Any
-import logging
-
-logger = logging.getLogger(__name__)
 
 
 class BaseNode:
@@ -22,7 +19,6 @@ class BaseNode:
                 ),
             }
         except Exception as e:
-            logger.warning(f"Failed to get model parameters: {str(e)}")
             return {}
 
     def _trace_node(self, inputs: Dict[str, Any], prompt_template: str = None):
@@ -41,7 +37,6 @@ class BaseNode:
 
             return self.tracer.start_node_run(self.node_name, trace_inputs)
         except Exception as e:
-            logger.warning(f"Failed to start node tracing: {str(e)}")
             return None
 
     def _end_trace(self, node_run_id, outputs: Dict[str, Any], status: str = "success"):
@@ -52,7 +47,7 @@ class BaseNode:
         try:
             self.tracer.end_run(node_run_id, {**outputs, "status": status})
         except Exception as e:
-            logger.warning(f"Failed to end node tracing: {str(e)}")
+            return None
 
     def execute(self, state):
         """Abstract method that must be implemented by subclasses"""

@@ -21,9 +21,8 @@ OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 
 # Langsmith tracing을 위한 키 로드
 LANGSMITH_API_KEY = st.secrets["LANGSMITH_API_KEY"]
-LANGSMITH_PROJECT = st.secrets["LANGSMITH_PROJECT"]
-LANGSMITH_TRACING = "true"
-LANGSMITH_ENDPOINT = "https://api.smith.langchain.com"
+LANGSMITH_PROJECT = "TourGuideRAG"
+
 
 tracer = TracingManager(LANGSMITH_API_KEY)
 
@@ -160,6 +159,10 @@ if "selected_category" not in st.session_state:
 if "selected_options" not in st.session_state:
     st.session_state.selected_options = []
 
+# Initialize workflow_run_id in session state if not present
+if "workflow_run_id" not in st.session_state:
+    st.session_state.workflow_run_id = None
+
 # Sidebar Design
 with st.sidebar:
     # Use `st.form` to prevent auto-rerun for filters
@@ -234,13 +237,19 @@ if message:
     st.session_state.trigger_search = True  # Flag to trigger app invoke
 
     # Create parent run for tracing
-    workflow_run_id = tracer.start_workflow_run(
+    st.session_state.workflow_run_id = tracer.start_workflow_run(
         "Tour Guide RAG Pipeline", {"question": message}
     )
 
 # Process the request if search was triggered
 if st.session_state.get("trigger_search", False):
     send_message(st.session_state.inputs["question"], "human")
+
+    # Start workflow run if not already started (for sidebar searches)
+    if st.session_state.workflow_run_id is None:
+        st.session_state.workflow_run_id = tracer.start_workflow_run(
+            "Tour Guide RAG Pipeline", st.session_state.inputs
+        )
 
     with st.chat_message("ai"):
         placeholder = st.empty()
@@ -259,8 +268,8 @@ if st.session_state.get("trigger_search", False):
             save_message(response["answer"], "ai")
 
     # End parent run for tracing
-    tracer.end_run(workflow_run_id, {"answer": response["answer"]})
+    tracer.end_run(st.session_state.workflow_run_id, {"answer": response["answer"]})
 
-    # Reset trigger after processing
+    # Reset trigger and workflow_run_id after processing
     st.session_state.trigger_search = False
     st.rerun()
