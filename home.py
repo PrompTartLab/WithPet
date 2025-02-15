@@ -21,10 +21,10 @@ OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 
 # Langsmith tracing을 위한 키 로드
 LANGSMITH_API_KEY = st.secrets["LANGSMITH_API_KEY"]
-LANGSMITH_PROJECT = "TourGuideRAG"
+LANGSMITH_PROJECT = st.secrets["LANGSMITH_PROJECT"]
+LANGSMITH_TRACING = "true"
 
-
-tracer = TracingManager(LANGSMITH_API_KEY)
+tracer = TracingManager(LANGSMITH_API_KEY, LANGSMITH_PROJECT)
 
 # 메시지 세션 스테이트 초기화
 if "messages" not in st.session_state:
@@ -72,8 +72,8 @@ def send_message(message: str, role: str, save: bool = True, placeholder=None) -
     else:
         with st.chat_message(role):
             st.markdown(message)  # Normal UI message if no placeholder
-            if save:
-                save_message(message, role)
+    if save:
+        save_message(message, role)
 
 
 def paint_history() -> None:
@@ -159,10 +159,6 @@ if "selected_category" not in st.session_state:
 if "selected_options" not in st.session_state:
     st.session_state.selected_options = []
 
-# Initialize workflow_run_id in session state if not present
-if "workflow_run_id" not in st.session_state:
-    st.session_state.workflow_run_id = None
-
 # Sidebar Design
 with st.sidebar:
     # Use `st.form` to prevent auto-rerun for filters
@@ -237,39 +233,52 @@ if message:
     st.session_state.trigger_search = True  # Flag to trigger app invoke
 
     # Create parent run for tracing
-    st.session_state.workflow_run_id = tracer.start_workflow_run(
+    workflow_run_id = tracer.start_workflow_run(
         "Tour Guide RAG Pipeline", {"question": message}
     )
 
 # Process the request if search was triggered
 if st.session_state.get("trigger_search", False):
+    # 사용자 메시지 저장 및 표시
     send_message(st.session_state.inputs["question"], "human")
 
-    # Start workflow run if not already started (for sidebar searches)
-    if st.session_state.workflow_run_id is None:
-        st.session_state.workflow_run_id = tracer.start_workflow_run(
-            "Tour Guide RAG Pipeline", st.session_state.inputs
-        )
+    workflow_run_id = tracer.start_workflow_run(
+        "Tour Guide RAG Pipeline", st.session_state.inputs
+    )
 
+    # 로딩 메시지 표시
     with st.chat_message("ai"):
         placeholder = st.empty()
         placeholder.markdown(
             "⌛질문에 해당하는 장소를 찾고 있습니다... 잠시만 기다려주세요."
         )
 
-    response = app.invoke(st.session_state.inputs)
-    print(response["answer"])
+    try:
+        # 응답 생성
+        response = app.invoke(st.session_state.inputs)
 
-    if response["data_source"] == "not_relevant" or response["sql_status"] == "no data":
-        placeholder.markdown(response["answer"])  # 플레이스홀더만 업데이트
-    else:
-        with st.chat_message("ai"):  # 새로운 메시지로 표시
-            st.markdown(response["answer"])
-            save_message(response["answer"], "ai")
+        # 응답이 있는 경우 메시지 전송
+        if response.get("answer"):
+            if (
+                response["data_source"] == "not_relevant"
+                or response["sql_status"] == "no data"
+            ):
+                send_message(response["answer"], "ai", placeholder=placeholder)
+            else:
+                send_message(response["answer"], "ai", placeholder=placeholder)
 
-    # End parent run for tracing
-    tracer.end_run(st.session_state.workflow_run_id, {"answer": response["answer"]})
+    except Exception as e:
+        # 예외 발생 시 에러 메시지 표시
+        send_message(
+            f"죄송합니다. 일시적인 문제가 발생했습니다. 잠시 후 다시 질문해 주시겠어요? 🙏",
+            "ai",
+            placeholder=placeholder,
+        )
 
-    # Reset trigger and workflow_run_id after processing
-    st.session_state.trigger_search = False
-    st.rerun()
+    finally:
+        # End parent run for tracing
+        tracer.end_run(workflow_run_id, {"answer": response.get("answer", "")})
+
+        # Reset trigger and rerun to refresh history
+        st.session_state.trigger_search = False
+        st.rerun()  # 전체 대화 기록을 다시 그리기 위한 rerun
