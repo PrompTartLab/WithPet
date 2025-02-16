@@ -1,16 +1,10 @@
-import streamlit as st
-import os
-import time
-
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from models.llm import CHATLLM
 from workflows.sql_workflow import SQLWorkflow
-from configs.examples import EXAMPLES
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain_community.vectorstores import FAISS
-from langchain_community.vectorstores import FAISS
-from langchain_core.tracers import LangChainTracer
-from langchain.callbacks.manager import CallbackManager
+
+import streamlit as st
 
 
 # OpenAI API 키 로드
@@ -159,7 +153,7 @@ with st.sidebar:
     with st.form("filter_form"):
         st.markdown(
             """
-            <h1 style="display: flex; justify-content: center; align-items: center;">
+            <h1 style="display: flex; justify-content: left; align-items: center;">
                 🚀 Quick Search 
                 <span style="font-size: 12px; vertical-align: sub; margin-left: 8px; cursor: pointer;" 
                     title="지역과 시설 유형을 선택한 후 검색하기를 클릭하세요.">
@@ -227,8 +221,6 @@ with st.sidebar:
 
             query_text = f"{city} 지역의 {st.session_state.selected_category}{' ('+ ', '.join(st.session_state.selected_options)+ ')' if st.session_state.selected_options else ''}"
 
-            # 검색 버튼
-            st.markdown("<br>", unsafe_allow_html=True)
             st.session_state.inputs = {"question": query_text}
             st.session_state.trigger_search = True  # Flag to trigger app invoke
 
