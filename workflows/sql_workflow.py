@@ -14,11 +14,9 @@ from nodes.generate_final_answer import (
     HandleNotRelevantNode,
 )
 from nodes.routing import check_data_source, check_sql_status
-
 from utils.data_utils import load_csv_to_sqlite
 
 import streamlit as st
-from langsmith import traceable
 import os
 
 # Langsmith tracing을 위한 키 로드
@@ -39,7 +37,7 @@ class SQLWorkflow:
     내부적으로 SQLite를 사용하여 CSV 데이터를 관리한다.
     """
 
-    def __init__(self, llm_chat, llm_stream, vector_store_example, tracer=None):
+    def __init__(self, llm_chat, llm_stream, vector_store_example):
         """
         Args:
             llm_chat: 모델 function call(Structured LLM)을 활용할 수 있는 LLM (ex. ChatOpenAI)
