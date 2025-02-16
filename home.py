@@ -16,13 +16,6 @@ from langchain.callbacks.manager import CallbackManager
 # OpenAI API 키 로드
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 
-# Langsmith tracing을 위한 키 로드
-LANGCHAIN_API_KEY = st.secrets["LANGCHAIN_API_KEY"]
-LANGCHAIN_PROJECT = st.secrets["LANGCHAIN_PROJECT"]
-LANGCHAIN_TRACING_V2 = "true"
-LANGCHAIN_ENDPOINT = "https://api.smith.langchain.com"
-
-
 # 메시지 세션 스테이트 초기화
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
@@ -84,9 +77,6 @@ def paint_history() -> None:
 def get_embeddings(api_key):
     return OpenAIEmbeddings(openai_api_key=api_key)
 
-
-tracer = LangChainTracer(project_name=LANGCHAIN_PROJECT)
-callback_manager = CallbackManager([tracer])
 
 chat_callback_handler = ChatCallbackHandler()
 

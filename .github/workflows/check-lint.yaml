@@ -40,15 +40,15 @@ jobs:
       - name: Check for missing end line breaks
         run: |
           # 따옴표를 제거하고 파일 목록 가져오기
-          files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | tr -d '"')
+          files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | tr -d '"' | grep '\.py$')
           success=true
 
-          echo "변경된 파일 목록:"
+          echo "변경된 Python 파일 목록:"
           echo "$files"
 
           echo "## 줄바꿈 누락 파일" >> $GITHUB_STEP_SUMMARY
           for file in $files; do
-            if [ -s "$file" ] && [ "$(tail -c 1 $file | wc -l)" -eq 0 ]; then
+            if [ -s "$file" ] && [ "$(tail -c 1 "$file" | wc -l)" -eq 0 ]; then
               echo "발견된 줄바꿈 누락: $file"
               echo "- $file" >> $GITHUB_STEP_SUMMARY
               success=false

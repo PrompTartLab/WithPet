@@ -14,8 +14,20 @@ from nodes.generate_final_answer import (
     HandleNotRelevantNode,
 )
 from nodes.routing import check_data_source, check_sql_status
-
 from utils.data_utils import load_csv_to_sqlite
+
+import streamlit as st
+import os
+
+# Langsmith tracing을 위한 키 로드
+if "LANGSMITH_PROJECT" not in st.session_state:
+    st.session_state["LANGSMITH_PROJECT"] = st.secrets["LANGSMITH_PROJECT"]
+    os.environ["LANGSMITH_PROJECT"] = st.session_state["LANGSMITH_PROJECT"]
+os.environ["LANGSMITH_TRACING"] = "true"
+os.environ["LANGSMITH_ENDPOINT"] = "https://api.smith.langchain.com"
+
+# 환경 변수가 제대로 설정되었는지 확인
+print(os.environ.get("LANGSMITH_PROJECT"))
 
 
 class SQLWorkflow:
@@ -95,7 +107,12 @@ class SQLRAGWorkflow:
     """
 
     def __init__(
-        self, llm_chat, llm_stream, conn, vector_store_example, vector_store_data
+        self,
+        llm_chat,
+        llm_stream,
+        conn,
+        vector_store_example,
+        vector_store_data,
     ):
         """
         Args:
