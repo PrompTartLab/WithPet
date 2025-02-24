@@ -12,12 +12,7 @@ from ..utils.setup import SetUp
 from ..workflows.sql_workflow import SQLWorkflow
 
 
-# OpenAI API 키 로드
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
-
-# 메시지 세션 스테이트 초기화
-if "messages" not in st.session_state:
-    st.session_state["messages"] = []
 
 st.set_page_config(
     page_title="WithPet",
@@ -103,6 +98,8 @@ def send_message(
 
 def paint_history() -> None:
     """세션 스테이트에 기록된 메시지를 모두 다시 출력합니다."""
+    if "messages" not in st.session_state:
+        st.session_state["messages"] = []
     for msg in st.session_state["messages"]:
         send_message(
             msg["message"],
