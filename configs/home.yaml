@@ -7,9 +7,9 @@ defaults:
   - source_columns: source_columns
   - hydra: hydra
 
-package_name: TourGuideRAG
-project_dir: ${oc.env:PROJECT_DIR}/${package_name}
-connected_dir: ${oc.env:CONNECTED_DIR}/${package_name}
+package_name: WithPet
+project_dir: ${oc.env:PROJECT_DIR}
+connected_dir: ${oc.env:CONNECTED_DIR}
 usage: withpet
 
 openai_api_key: ${oc.env:OPENAI_API_KEY}
