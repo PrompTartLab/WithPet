@@ -40,8 +40,13 @@ jobs:
       - name: Check for missing end line breaks
         run: |
           # 따옴표를 제거하고 파일 목록 가져오기
-          files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | tr -d '"' | grep '\.py$')
+          files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | tr -d '"' | grep '\.py$' || true)
           success=true
+
+          if [ -z "$files" ]; then
+            echo "변경된 Python 파일이 없습니다."
+            exit 0
+          fi
 
           echo "변경된 Python 파일 목록:"
           echo "$files"
