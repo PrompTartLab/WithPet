@@ -55,5 +55,8 @@ class VerifySQLNode(BaseNode):
                 .to_markdown(index=False),
             )
         else:
+<<<<<<< HEAD
+=======
             print(filtered_data)
+>>>>>>> fa22dc325b401e7c6da23c1dd677fba5ffb46172
             return GraphState(sql_status="no data")
