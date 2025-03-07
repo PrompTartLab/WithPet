@@ -13,7 +13,21 @@ pet_places: |
       - TEL_NO (TEXT): Contact phone number of the facility.
       - HOMEPAGE_URL (TEXT): Website URL of the facility.
       - HOLIDAY_INFORMATION (TEXT): Information about facility closure days.
-      - OPERATION_TIME (TEXT): Operating hours of the facility. (e.g. 월화수목금 10:00~19:00, 토일요일 10:00~19:00, 법정공휴일 10:00~17:00)
+      - OPEN_HOUR_MON (TEXT): Opening hours of the facility on Monday (format: hh:mm)
+      - CLOSE_HOUR_MON (TEXT): Closing hours of the facility on Monday (format: hh:mm)
+      - OPEN_HOUR_TUE (TEXT): Opening hours of the facility on Tuesday (format: hh:mm)
+      - CLOSE_HOUR_TUE (TEXT): Closing hours of the facility on Tuesday (format: hh:mm)
+      - OPEN_HOUR_WED (TEXT): Opening hours of the facility on Wednesday (format: hh:mm)
+      - CLOSE_HOUR_WED (TEXT): Closing hours of the facility on Wednesday (format: hh:mm)
+      - OPEN_HOUR_THU (TEXT): Opening hours of the facility on Thursday (format: hh:mm)
+      - CLOSE_HOUR_THU (TEXT): Closing hours of the facility on Thursday (format: hh:mm)
+      - OPEN_HOUR_FRI (TEXT): Opening hours of the facility on Friday (format: hh:mm)
+      - CLOSE_HOUR_FRI (TEXT): Closing hours of the facility on Friday (format: hh:mm)
+      - OPEN_HOUR_SAT (TEXT): Opening hours of the facility on Saturday (format: hh:mm)
+      - CLOSE_HOUR_SAT (TEXT): Closing hours of the facility on Saturday (format: hh:mm)
+      - OPEN_HOUR_SUN (TEXT): Opening hours of the facility on Sunday (format: hh:mm)
+      - CLOSE_HOUR_SUN (TEXT): Closing hours of the facility on Sunday (format: hh:mm)
+      - OPENING_WEEKDAYS (TEXT): Operating weekdays of the facility (e.g. 월화금토일)
       - OPERATION_TIME_DISPLAY (TEXT): Operating hours of the facility for display. Do not use this column in sql filtering.
       - PARKING_LOT_YN (TEXT): Indicates whether parking is available (Y/N).
       - USAGE_PRICE (TEXT): Details about usage fees.
