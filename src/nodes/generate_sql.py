@@ -43,7 +43,6 @@ class GenerateSQLNode(BaseNode):
             }
         )
 
-        print("\n", response.content)
         return GraphState(
             schema=schema,
             sql_response=response.content,
