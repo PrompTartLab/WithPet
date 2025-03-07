@@ -3,6 +3,7 @@ import os
 import streamlit as st
 
 from langchain.callbacks.base import BaseCallbackHandler
+from langgraph.graph.state import CompiledStateGraph
 from langchain_openai import OpenAIEmbeddings
 
 from hydra.utils import instantiate
@@ -113,9 +114,9 @@ def get_embeddings(api_key: str) -> OpenAIEmbeddings:
     return OpenAIEmbeddings(openai_api_key=api_key)
 
 
-def pipeline(
+def load_workflow(
     config: DictConfig,
-) -> None:
+) -> CompiledStateGraph:
     chat_callback_handler = ChatCallbackHandler()
     embeddings = get_embeddings(api_key=config.openai_api_key)
 
@@ -157,6 +158,13 @@ def pipeline(
     )
 
     app = workflow.setup_workflow()
+    return app
+
+
+def pipeline(
+    config: DictConfig,
+) -> None:
+    app = load_workflow(config)
 
     st.markdown(
         """
@@ -329,7 +337,6 @@ def pipeline(
             )
 
         response = app.invoke(st.session_state.inputs)
-        print(response["answer"])
 
         if (
             response["data_source"] == "not_relevant"
