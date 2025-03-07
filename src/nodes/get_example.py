@@ -19,8 +19,7 @@ class GetExampleNode(BaseNode):
         examples_format = "\n\n".join(
             [
                 f'<QUESTION> {doc.metadata["question"]} </QUESTION>\n<SQL> {doc.metadata["sql"]} </SQL>'
-                for doc in examples_topk[:3]
+                for doc in examples_topk[:5]
             ]
         )
-        print(examples_format)
         return GraphState(examples=examples_format)
