@@ -1,22 +1,19 @@
-from typing import Dict
-
 from langchain_core.prompts import PromptTemplate
 
 from .base_node import BaseNode
 
 from ..modules.context import Context
 from ..modules.graph_state import GraphState
+from ..modules.response_schema import SQLQuery
 
 
 class GenerateSQLNode(BaseNode):
     def __init__(
         self,
         context: Context,
-        schemas: Dict[str, str],
         sql_generation_template: PromptTemplate,
     ) -> None:
         super().__init__(context=context)
-        self.schemas = schemas
         self.sql_generation_template = sql_generation_template
 
     def execute(
@@ -27,12 +24,10 @@ class GenerateSQLNode(BaseNode):
         data_source = state["data_source"]
         question = state["question"]
         examples = state["examples"]
-        schema = self.schemas.get(
-            data_source,
-            {},
-        )
+        schema = state["schema"]
 
-        sql_chain = self.sql_generation_template | llm
+        structured_llm = llm.with_structured_output(SQLQuery)
+        sql_chain = self.sql_generation_template | structured_llm
         response = sql_chain.invoke(
             {
                 "question": question,
@@ -44,6 +39,5 @@ class GenerateSQLNode(BaseNode):
         )
 
         return GraphState(
-            schema=schema,
-            sql_response=response.content,
+            generated_sql=response.sql,
         )

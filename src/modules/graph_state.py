@@ -6,7 +6,7 @@ class GraphState(TypedDict):
     data_source: str
     schema: str
     examples: str
-    sql_response: str
+    generated_sql: str
     sql_status: str
     trial_num: int
     filtered_data: str
