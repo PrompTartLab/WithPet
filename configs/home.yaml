@@ -1,7 +1,6 @@
 # @package _global_
 defaults:
   - llms: llms
-  - prompts: prompts
   - prompt_templates: prompt_templates
   - schemas: schemas
   - source_columns: source_columns
