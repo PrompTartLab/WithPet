@@ -49,6 +49,7 @@ sql_generation_template:
           END AS CLOSE_HOUR
         - If there are multiple conditions, combine them using `AND`.
           - 24시간 영업, 금요일 영업: OPEN_HOUR = '00:00' AND CLOSE_HOUR = '24:00' AND OPENING_WEEKDAYS LIKE '%금%'
+          - 아침 9시 이전에 영업, 밤 10시 이후 영업: OPEN_HOUR <= '09:00' AND CLOSE_HOUR > '10:00'
     5. **Ensure Schema Accuracy**: Always ensure the column names in the query match those defined in the schema exactly.
     6. **Answer only with SQL**, without any extra format or explanation.
 
