@@ -139,7 +139,9 @@ def load_workflow(
         vs_data=vs_data,
     )
 
-    source_routing_prompt = config.prompts.source_routing_prompt
+    source_routing_template = setup.get_prompt_template(
+        prompt_type=config.prompt_type.source_routing_template
+    )
     sql_generation_template = setup.get_prompt_template(
         prompt_type=config.prompt_type.sql_generation_template
     )
@@ -150,7 +152,7 @@ def load_workflow(
 
     workflow = SQLWorkflow(
         context=context,
-        source_routing_prompt=source_routing_prompt,
+        source_routing_template=source_routing_template,
         schemas=config.schemas,
         sql_generation_template=sql_generation_template,
         source_columns=source_columns,

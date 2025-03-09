@@ -28,7 +28,7 @@ class SQLWorkflow:
     def __init__(
         self,
         context: Context,
-        source_routing_prompt: str,
+        source_routing_template: PromptTemplate,
         schemas: Dict[str, str],
         sql_generation_template: PromptTemplate,
         source_columns: Dict[str, List[str]],
@@ -42,7 +42,7 @@ class SQLWorkflow:
         self.workflow = StateGraph(GraphState)
         self.app = None
         self.context = context
-        self.source_routing_prompt = source_routing_prompt
+        self.source_routing_template = source_routing_template
         self.schemas = schemas
         self.sql_generation_template = sql_generation_template
         self.source_columns = source_columns
@@ -51,12 +51,12 @@ class SQLWorkflow:
     def setup_workflow(self) -> CompiledStateGraph:
         select_data_node = SelectDataNode(
             context=self.context,
-            source_routing_prompt=self.source_routing_prompt,
+            schemas=self.schemas,
+            source_routing_template=self.source_routing_template,
         )
         get_example_node = GetExampleNode(context=self.context)
         generate_sql_node = GenerateSQLNode(
             context=self.context,
-            schemas=self.schemas,
             sql_generation_template=self.sql_generation_template,
         )
         verify_sql_node = VerifySQLNode(
