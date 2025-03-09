@@ -18,8 +18,8 @@ sql_retry_template:
     4. **Filter Opearing Time with Specific Rules**: 
         - For filtering operating days, use LIKE to match specific days:
           - Monday: DAYTIME_COLUMN LIKE "%월%"
-          - Weekend: DAYTIME_COLUMN LIKE "%토일%"
-        - For filtering operating hours, use CASE-WHEN-THEN to select the correct column dynamically based on today's weekday:
+          - Weekend: DAYTIME_COLUMN LIKE "%토% AND DAYTIME_COLUMN LIKE "%일%"
+        - For filtering operating hours, use CASE-WHEN-THEN to select the correct column dynamically based on today's weekday unless the user specifies the weekday:
           - CASE strftime('%w', 'now')
               WHEN '0' THEN OPEN_HOUR_SUN
               WHEN '1' THEN OPEN_HOUR_MON
@@ -31,7 +31,6 @@ sql_retry_template:
           END AS OPEN_HOUR,
         - If there are multiple conditions, use AND operation.
     5. **Ensure Schema Accuracy**: Always ensure the column names in the query match those defined in the schema exactly.
-    6. **SQL Tagging**: Wrap the generated SQL query between `<SQL>` and `</SQL>` tags to clearly separate it from other content.
 
     In a prior turn, you have predicted a SQL, which returned no results. Your job now is to generate a new SQL to try again.
     In general, you should try to RELAX constraints.
@@ -64,7 +63,7 @@ sql_generation_template:
         - For filtering operating days, use LIKE to match specific days:
           - Monday: DAYTIME_COLUMN LIKE "%월%"
           - Weekend: DAYTIME_COLUMN LIKE "%토% AND DAYTIME_COLUMN LIKE "%일%"
-        - For filtering operating hours, use CASE-WHEN-THEN to select the correct column dynamically based on today's weekday:
+        - For filtering operating hours, use CASE-WHEN-THEN to select the correct column dynamically based on today's weekday unless the user specifies the weekday:
           - CASE strftime('%w', 'now')
               WHEN '0' THEN OPEN_HOUR_SUN
               WHEN '1' THEN OPEN_HOUR_MON
@@ -76,7 +75,6 @@ sql_generation_template:
           END AS OPEN_HOUR,
         - If there are multiple conditions, use AND operation.
     5. **Ensure Schema Accuracy**: Always ensure the column names in the query match those defined in the schema exactly.
-    6. **SQL Tagging**: Wrap the generated SQL query between `<SQL>` and `</SQL>` tags to clearly separate it from other content.
 
     Table schema: {schema}
     External knowledge: {external_knowledge}
