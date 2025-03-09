@@ -11,5 +11,5 @@ class QueryRouter(BaseModel):
 
 class SQLQuery(BaseModel):
     sql: str = Field(
-        description="The generated SQL query.",
+        description="The generated SQL query without any explanation.",
     )
