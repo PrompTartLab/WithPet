@@ -24,21 +24,11 @@ class VerifySQLNode(BaseNode):
         self,
         state: GraphState,
     ) -> GraphState:
-        response = state["sql_response"]
+        sql = state["generated_sql"]
         data_source = state["data_source"]
 
-        match = re.search(
-            r"<SQL>(.*?)</SQL>",
-            response,
-            re.DOTALL,
-        )
-        if match:
-            sql_query = match.group(1).strip()
-        else:
-            return GraphState(sql_status="retry")
-
         filtered_data = filter_csv_with_sql(
-            query=sql_query,
+            query=sql,
             conn=self.context.conn,
         )
         if isinstance(filtered_data, pd.DataFrame) and not filtered_data.empty:
@@ -54,6 +44,8 @@ class VerifySQLNode(BaseNode):
                 .head()
                 .to_markdown(index=False),
             )
+        elif isinstance(filtered_data, pd.DataFrame):
+            return GraphState(sql_status="no data")
         else:
             print(filtered_data)
-            return GraphState(sql_status="no data")
+            return GraphState(sql_status="retry")
