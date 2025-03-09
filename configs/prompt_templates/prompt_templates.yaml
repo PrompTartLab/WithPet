@@ -1,48 +1,11 @@
-sql_retry_template:
+source_routing_template:
   _target_: langchain_core.prompts.PromptTemplate
   input_variables:
     - question
-    - data_source
-    - examples
-    - schema
-    - external_knowledge
-    - previous_answer
   template: |
-    You are an expert in generating SQL queries. Your task is to create SQL queries based on the user's question and the provided schema.
-
-    You must follow these rules:
-    ### Rules for SQL Generation:
-    1. **Match Columns to Conditions**: Identify relevant columns in the schema that correspond to the conditions in the user's query. Use only columns specified in the schema.
-    2. **Avoid Unnecessary Filters**: If part of the query has no directly corresponding column, do not add assumptions or irrelevant filters. Instead, retrieve all data using `SELECT * FROM {data_source}`.
-    3. **Include Only Relevant Columns in WHERE Clause**: Only include columns in the `WHERE` clause that are directly related to the query. Do not infer conditions beyond what is explicitly asked in the query.
-    4. **Filter Opearing Time with Specific Rules**: 
-        - For filtering operating days, use LIKE to match specific days:
-          - Monday: DAYTIME_COLUMN LIKE "%월%"
-          - Weekend: DAYTIME_COLUMN LIKE "%토% AND DAYTIME_COLUMN LIKE "%일%"
-        - For filtering operating hours, use CASE-WHEN-THEN to select the correct column dynamically based on today's weekday unless the user specifies the weekday:
-          - CASE strftime('%w', 'now')
-              WHEN '0' THEN OPEN_HOUR_SUN
-              WHEN '1' THEN OPEN_HOUR_MON
-              WHEN '2' THEN OPEN_HOUR_TUE
-              WHEN '3' THEN OPEN_HOUR_WED
-              WHEN '4' THEN OPEN_HOUR_THU
-              WHEN '5' THEN OPEN_HOUR_FRI
-              WHEN '6' THEN OPEN_HOUR_SAT
-          END AS OPEN_HOUR,
-        - If there are multiple conditions, use AND operation.
-    5. **Ensure Schema Accuracy**: Always ensure the column names in the query match those defined in the schema exactly.
-
-    In a prior turn, you have predicted a SQL, which returned no results. Your job now is to generate a new SQL to try again.
-    In general, you should try to RELAX constraints.
-
-    Table schema: {schema}
-    External knowledge: {external_knowledge}
-    Prior sql: {previous_answer}
-
-    For your information, I'll provide examples of query-answer pairs.
-    {examples}
-
-    Question: {question}
+    You are an expert at routing a user question to the appropriate data source. The data sources are described below:
+    Return "pet_places" if the query is about finding or asking for facilities such as hospitals, museums, cafes, restaurants, hotels, or any other physical locations where services or activities are provided.
+    Return "not_relevant" if the query is not related to finding facilities, such as general knowledge questions or general chat.
 
 sql_generation_template:
   _target_: langchain_core.prompts.PromptTemplate

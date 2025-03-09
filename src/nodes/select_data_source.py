@@ -1,4 +1,6 @@
-from langchain_core.prompts import ChatPromptTemplate
+from typing import Dict
+
+from langchain_core.prompts import PromptTemplate
 
 from .base_node import BaseNode
 
@@ -11,10 +13,12 @@ class SelectDataNode(BaseNode):
     def __init__(
         self,
         context: Context,
-        source_routing_prompt: str,
+        schemas: Dict[str, str],
+        source_routing_template: PromptTemplate,
     ) -> None:
         super().__init__(context=context)
-        self.source_routing_prompt = source_routing_prompt
+        self.schemas = schemas
+        self.source_routing_template = source_routing_template
 
     def execute(
         self,
@@ -24,17 +28,17 @@ class SelectDataNode(BaseNode):
         question = state["question"]
 
         structured_llm = llm.with_structured_output(QueryRouter)
-
-        prompt = ChatPromptTemplate.from_messages(
-            [
-                ("system", self.source_routing_prompt),
-                ("human", "{question}"),
-            ]
+        router = self.source_routing_template | structured_llm
+        response = router.invoke(
+            {
+                "question": question,
+            }
         )
-
-        # Define router
-        router = prompt | structured_llm
-
-        response = router.invoke(question)
-        print(response.datasource)
-        return GraphState(data_source=response.datasource)
+        schema = self.schemas.get(
+            response.datasource,
+            {},
+        )
+        return GraphState(
+            schema=schema,
+            data_source=response.datasource,
+        )

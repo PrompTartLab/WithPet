@@ -28,6 +28,7 @@ data_path: ${connected_dir}/data
 data_file_name: PET_PLACES
 
 prompt_type:
+  source_routing_template: source_routing_template
   sql_generation_template: sql_generation_template
   answer_generation_template: answer_generation_template
 
