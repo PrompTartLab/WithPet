@@ -37,7 +37,16 @@ sql_generation_template:
                 WHEN '4' THEN OPEN_HOUR_THU
                 WHEN '5' THEN OPEN_HOUR_FRI
                 WHEN '6' THEN OPEN_HOUR_SAT
-            END AS OPEN_HOUR
+            END AS OPEN_HOUR,
+            CASE strftime('%w', 'now')
+              WHEN '0' THEN CLOSE_HOUR_SUN
+              WHEN '1' THEN CLOSE_HOUR_MON
+              WHEN '2' THEN CLOSE_HOUR_TUE
+              WHEN '3' THEN CLOSE_HOUR_WED
+              WHEN '4' THEN CLOSE_HOUR_THU
+              WHEN '5' THEN CLOSE_HOUR_FRI
+              WHEN '6' THEN CLOSE_HOUR_SAT
+          END AS CLOSE_HOUR
         - If there are multiple conditions, combine them using `AND`.
           - 24시간 영업, 금요일 영업: OPEN_HOUR = '00:00' AND CLOSE_HOUR = '24:00' AND OPENING_WEEKDAYS LIKE '%금%'
     5. **Ensure Schema Accuracy**: Always ensure the column names in the query match those defined in the schema exactly.
