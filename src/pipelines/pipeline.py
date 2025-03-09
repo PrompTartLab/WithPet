@@ -116,14 +116,16 @@ def get_embeddings(api_key: str) -> OpenAIEmbeddings:
 
 def load_workflow(
     config: DictConfig,
+    stream: bool = True,
 ) -> CompiledStateGraph:
+
     chat_callback_handler = ChatCallbackHandler()
     embeddings = get_embeddings(api_key=config.openai_api_key)
 
     setup = SetUp(config)
 
     llm = setup.get_llm()
-    llm_stream = setup.get_llm_stream(chat_callback_handler)
+    llm_stream = setup.get_llm_stream(chat_callback_handler) if stream else llm
     conn = setup.get_connection()
     vs_example = setup.get_vs_example(embeddings=embeddings)
     if os.path.exists(config.vector_store_data):
@@ -166,7 +168,11 @@ def load_workflow(
 def pipeline(
     config: DictConfig,
 ) -> None:
-    app = load_workflow(config)
+
+    app = load_workflow(
+        config=config,
+        stream=True,
+    )
 
     st.markdown(
         """
@@ -265,7 +271,6 @@ def pipeline(
                 [
                     "☕ 카페",
                     "🏡 펜션",
-                    "🏨 호텔",
                     "🏥 동물병원",
                     "💊 동물약국",
                     "✂️ 미용",
@@ -275,7 +280,6 @@ def pipeline(
                 index=[
                     "카페",
                     "펜션",
-                    "호텔",
                     "동물병원",
                     "동물약국",
                     "미용",
