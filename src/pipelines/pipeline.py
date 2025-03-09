@@ -3,8 +3,9 @@ import os
 import streamlit as st
 
 from langchain.callbacks.base import BaseCallbackHandler
-from langgraph.graph.state import CompiledStateGraph
 from langchain_openai import OpenAIEmbeddings
+from langgraph.graph.state import CompiledStateGraph
+from langgraph.errors import GraphRecursionError
 
 from hydra.utils import instantiate
 from omegaconf import DictConfig
@@ -344,15 +345,23 @@ def pipeline(
             placeholder.markdown(
                 "⌛질문에 해당하는 장소를 찾고 있습니다... 잠시만 기다려주세요."
             )
-
-        response = app.invoke(st.session_state.inputs)
-
-        if (
-            response["data_source"] == "not_relevant"
-            or response["sql_status"] == "no data"
-        ):
+        try:
+            response = app.invoke(
+                st.session_state.inputs,
+                {"recursion_limit": 10},
+            )
+            if (
+                response["data_source"] == "not_relevant"
+                or response["sql_status"] == "no data"
+            ):
+                send_message(
+                    response["answer"],
+                    "ai",
+                    placeholder,
+                )
+        except GraphRecursionError:
             send_message(
-                response["answer"],
+                "질문 처리 중 오류가 발생했습니다. 다시 시도해주세요.",
                 "ai",
                 placeholder,
             )

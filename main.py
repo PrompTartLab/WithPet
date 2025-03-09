@@ -13,6 +13,7 @@ warnings.filterwarnings("ignore")
 
 from hydra import initialize, compose
 from hydra.core.global_hydra import GlobalHydra
+from langgraph.errors import GraphRecursionError
 
 from src.pipelines.pipeline import load_workflow
 
@@ -47,13 +48,18 @@ if __name__ == "__main__":
         job_name=JOB_NAME,
         config_name=CONFIG_NAME,
     )
-    for chunk in app.stream(
-        {"question": "서울 지역의 동물병원 (아침 9시 전 영업, 금요일 영업)"},
-        stream_mode="updates",
-    ):
-        for step, state in chunk.items():
-            print(f"[{step}]\n")
-            for k, v in state.items():
-                if k not in ["schema", "formatted_data", "filtered_data"]:
-                    print(f"{k}\n{v}")
-        print("-" * 100)
+
+    try:
+        for chunk in app.stream(
+            {"question": "서초구에서 8시 반에 미용 가능한 곳"},
+            {"recursion_limit": 10},
+            stream_mode="updates",
+        ):
+            for step, state in chunk.items():
+                print(f"[{step}]\n")
+                for k, v in state.items():
+                    if k not in ["schema", "formatted_data", "filtered_data"]:
+                        print(f"{k}\n{v}")
+            print("-" * 100)
+    except GraphRecursionError:
+        print("Recursion Error")
