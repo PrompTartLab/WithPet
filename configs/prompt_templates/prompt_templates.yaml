@@ -23,21 +23,25 @@ sql_generation_template:
     2. **Avoid Unnecessary Filters**: If part of the query has no directly corresponding column, do not add assumptions or irrelevant filters. Instead, retrieve all data using `SELECT * FROM {data_source}`.
     3. **Include Only Relevant Columns in WHERE Clause**: Only include columns in the `WHERE` clause that are directly related to the query. Do not infer conditions beyond what is explicitly asked in the query.
     4. **Filter Opearing Time with Specific Rules**: 
-        - For filtering operating days, use LIKE to match specific days:
-          - Monday: DAYTIME_COLUMN LIKE "%월%"
-          - Weekend: DAYTIME_COLUMN LIKE "%토% AND DAYTIME_COLUMN LIKE "%일%"
-        - For filtering operating hours, use CASE-WHEN-THEN to select the correct column dynamically based on today's weekday unless the user specifies the weekday:
-          - CASE strftime('%w', 'now')
-              WHEN '0' THEN OPEN_HOUR_SUN
-              WHEN '1' THEN OPEN_HOUR_MON
-              WHEN '2' THEN OPEN_HOUR_TUE
-              WHEN '3' THEN OPEN_HOUR_WED
-              WHEN '4' THEN OPEN_HOUR_THU
-              WHEN '5' THEN OPEN_HOUR_FRI
-              WHEN '6' THEN OPEN_HOUR_SAT
-          END AS OPEN_HOUR,
-        - If there are multiple conditions, use AND operation.
+        - For filtering **operating days**, use `LIKE` to match specific days:
+          - Monday: `DAYTIME_COLUMN LIKE "%월%"`
+          - Weekend: `DAYTIME_COLUMN LIKE "%토%" AND DAYTIME_COLUMN LIKE "%일%"`
+        - For filtering **operating hours**, use:
+          - **If the user specifies a weekday**, use the corresponding column directly (e.g. OPEN_HOUR_SUN, CLOSE_HOUR_FRI).
+          - **If no specific weekday is mentioned**, dynamically select the column using `CASE-WHEN-THEN`:
+            CASE strftime('%w', 'now')
+                WHEN '0' THEN OPEN_HOUR_SUN
+                WHEN '1' THEN OPEN_HOUR_MON
+                WHEN '2' THEN OPEN_HOUR_TUE
+                WHEN '3' THEN OPEN_HOUR_WED
+                WHEN '4' THEN OPEN_HOUR_THU
+                WHEN '5' THEN OPEN_HOUR_FRI
+                WHEN '6' THEN OPEN_HOUR_SAT
+            END AS OPEN_HOUR
+        - If there are multiple conditions, combine them using `AND`.
+          - 24시간 영업, 금요일 영업: OPEN_HOUR = '00:00' AND CLOSE_HOUR = '24:00' AND OPENING_WEEKDAYS LIKE '%금%'
     5. **Ensure Schema Accuracy**: Always ensure the column names in the query match those defined in the schema exactly.
+    6. **Answer only with SQL**, without any extra format or explanation.
 
     Table schema: {schema}
     External knowledge: {external_knowledge}
