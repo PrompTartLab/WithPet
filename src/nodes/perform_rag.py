@@ -8,12 +8,12 @@ class PerformRAGNode(BaseNode):
         self,
         state: GraphState,
     ) -> GraphState:
-        question = state["question"]
+        query = state["refined_question"]
         data_source = state["data_source"]
         filtered_data = state["filtered_data"]
         print(filtered_data["INDEX"].to_list())
         retrieved_data = self.context.vs_data.similarity_search(
-            question,
+            query,
             k=5,
             filter={
                 "SOURCE": data_source,

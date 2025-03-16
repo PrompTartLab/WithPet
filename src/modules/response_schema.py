@@ -13,3 +13,9 @@ class SQLQuery(BaseModel):
     sql: str = Field(
         description="The generated SQL query without any explanation.",
     )
+
+
+class RefinedQuestion(BaseModel):
+    question: str = Field(
+        description="The refined user question based on the requirements.",
+    )
