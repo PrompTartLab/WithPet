@@ -61,6 +61,34 @@ sql_generation_template:
 
     Question: {question}
 
+
+question_refinement_template:
+  _target_: langchain_core.prompts.PromptTemplate
+  input_variables:
+    - question
+    - generated_sql
+  template: |
+    Your task is to refine the user's query by removing context that is already included in the generated SQL filters.
+    You need to remove any conditions from the original query that are explicitly covered by the SQL query filters, while keeping any remaining descriptive or subjective elements.
+
+    ### Example:
+    #### Input:
+    User question: "서울 성동구에서 주차 가능한 분위기 좋은 카페"
+    Generated SQL:
+    SELECT * FROM PET_PLACES 
+    WHERE LAND_LOT_ADDRESS LIKE '%서울특별시 성동구%' 
+    AND CATEGORY_NM = '카페' 
+    AND PARKING_LOT_YN = 'Y'
+
+    #### Output:
+    Refined question: **"분위기 좋은"**
+
+    ### Task:
+    Given the user query: {question} 
+    And the SQL generated:
+    {generated_sql}
+
+
 answer_generation_template:
   _target_: langchain_core.prompts.PromptTemplate
   input_variables:

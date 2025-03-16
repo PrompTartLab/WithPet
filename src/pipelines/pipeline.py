@@ -149,6 +149,9 @@ def load_workflow(
     answer_generation_template = setup.get_prompt_template(
         prompt_type=config.prompt_type.answer_generation_template
     )
+    question_refinement_template = setup.get_prompt_template(
+        prompt_type=config.prompt_type.question_refinement_template
+    )
 
     workflow = SQLWorkflow(
         context=context,
@@ -157,6 +160,7 @@ def load_workflow(
         sql_generation_template=sql_generation_template,
         source_columns=source_columns,
         answer_generation_template=answer_generation_template,
+        question_refinement_template=question_refinement_template,
     )
 
     app = workflow.setup_workflow()

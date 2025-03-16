@@ -11,6 +11,7 @@ from ..nodes.select_data_source import SelectDataNode
 from ..nodes.get_example import GetExampleNode
 from ..nodes.generate_sql import GenerateSQLNode
 from ..nodes.execute_sql import ExecuteSQLNode
+from ..nodes.rewrite_question import RewriteQuestionNode
 from ..nodes.perform_rag import PerformRAGNode
 from ..nodes.generate_final_answer import (
     GenerateAnswerNode,
@@ -34,6 +35,7 @@ class SQLWorkflow:
         sql_generation_template: PromptTemplate,
         source_columns: Dict[str, List[str]],
         answer_generation_template: PromptTemplate,
+        question_refinement_template: PromptTemplate,
     ) -> None:
         """
         Args:
@@ -45,6 +47,7 @@ class SQLWorkflow:
         self.context = context
         self.source_routing_template = source_routing_template
         self.schemas = schemas
+        self.question_refinement_template = question_refinement_template
         self.sql_generation_template = sql_generation_template
         self.source_columns = source_columns
         self.answer_generation_template = answer_generation_template
@@ -63,6 +66,10 @@ class SQLWorkflow:
         execute_sql_node = ExecuteSQLNode(
             context=self.context,
             source_columns=self.source_columns,
+        )
+        rewrite_question_node = RewriteQuestionNode(
+            context=self.context,
+            question_refinement_template=self.question_refinement_template,
         )
         perform_rag_node = PerformRAGNode(
             context=self.context,
@@ -91,6 +98,10 @@ class SQLWorkflow:
             execute_sql_node.execute,
         )
         self.workflow.add_node(
+            "rewrite_question",
+            rewrite_question_node.execute,
+        )
+        self.workflow.add_node(
             "perform_rag",
             perform_rag_node.execute,
         )
@@ -114,6 +125,10 @@ class SQLWorkflow:
         self.workflow.add_edge(
             "generate_sql",
             "execute_sql",
+        )
+        self.workflow.add_edge(
+            "rewrite_question",
+            "perform_rag",
         )
         self.workflow.add_edge(
             "perform_rag",
@@ -141,7 +156,7 @@ class SQLWorkflow:
             self.check_sql_status,
             {
                 "RETRY": "generate_sql",
-                "DATA_EXISTS": "perform_rag",
+                "DATA_EXISTS": "rewrite_question",
                 "NO_DATA": "handle_no_data",
             },
         )
