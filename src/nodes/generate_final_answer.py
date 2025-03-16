@@ -22,11 +22,7 @@ class GenerateAnswerNode(BaseNode):
         llm = self.context.llm_stream
         question = state["question"]
         schema = state["schema"]
-        data = (
-            state["web_response"]
-            if state["data_source"] == "web"
-            else state["filtered_data"]
-        )
+        data = state["formatted_data"]
 
         chain = self.answer_generation_template | llm
         final_answer = chain.invoke(

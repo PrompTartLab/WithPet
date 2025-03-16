@@ -1,4 +1,5 @@
 from typing import TypedDict
+import pandas as pd
 
 
 class GraphState(TypedDict):
@@ -9,6 +10,7 @@ class GraphState(TypedDict):
     generated_sql: str
     sql_status: str
     trial_num: int
-    filtered_data: str
+    filtered_data: pd.DataFrame
+    formatted_data: str
     web_response: str
     answer: str

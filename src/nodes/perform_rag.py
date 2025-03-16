@@ -1,7 +1,6 @@
 from .base_node import BaseNode
 
 from ..modules.graph_state import GraphState
-from ..utils.data_utils import format_docs_with_metadata, format_dataframe
 
 
 class PerformRAGNode(BaseNode):
@@ -12,20 +11,19 @@ class PerformRAGNode(BaseNode):
         question = state["question"]
         data_source = state["data_source"]
         filtered_data = state["filtered_data"]
-        retriever = self.context.vs_data.as_retriever(
-            search_kwargs={
-                "k": 10,
-                "filter": {
-                    "SOURCE": data_source,
-                    "INDEX": filtered_data["INDEX"].to_list(),
-                },
-            }
+        print(filtered_data["INDEX"].to_list())
+        retrieved_data = self.context.vs_data.similarity_search(
+            question,
+            k=5,
+            filter={
+                "SOURCE": data_source,
+                "INDEX": {"$in": filtered_data["INDEX"].to_list()},
+            },
         )
-        results = retriever.invoke(question)
-        print(results)
-        if len(results) == 0:
-            return GraphState(
-                rag_filtered_data=format_dataframe(filtered_data.head(5), data_source)
-            )
-        rag_filtered_data = format_docs_with_metadata(results)
-        return GraphState(filtered_data=rag_filtered_data)
+        retrieved_index = [res.metadata["INDEX"] for res in retrieved_data]
+        print("Retrieved data Length: ", len(retrieved_index))
+        return GraphState(
+            formatted_data=filtered_data[filtered_data["INDEX"].isin(retrieved_index)]
+            .head()
+            .to_markdown(index=False),
+        )
