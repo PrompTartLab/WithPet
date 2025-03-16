@@ -13,6 +13,8 @@ usage: withpet
 
 openai_api_key: ${oc.env:OPENAI_API_KEY}
 serpapi_api_key: ${oc.env:SERPAPI_API_KEY}
+pinecone_api_key: ${oc.env:PINECONE_API_KEY}
+pinecone_index_name: ${oc.env:PINECONE_INDEX_NAME}
 
 llm:
   model: gpt-4o
@@ -32,7 +34,6 @@ prompt_type:
   answer_generation_template: answer_generation_template
 
 vector_store_example: faiss_example
-vector_store_data: faiss_data
 
 web_search:
   translate_template: "You are a professional translator. Given the query '{query}', provide the best result of Korean to English."

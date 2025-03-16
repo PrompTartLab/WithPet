@@ -1,72 +1,49 @@
+from typing import Dict, List
+
 import re
 
 import pandas as pd
 
 from .base_node import BaseNode
 
+from ..modules.context import Context
 from ..modules.graph_state import GraphState
-from ..utils.data_utils import filter_csv_with_sql, format_dataframe
+from ..utils.data_utils import filter_csv_with_sql
 
 
 class ExecuteSQLNode(BaseNode):
+    def __init__(
+        self,
+        context: Context,
+        source_columns: Dict[str, List[str]],
+    ) -> None:
+        super().__init__(context=context)
+        self.source_columns = source_columns
+
     def execute(
         self,
         state: GraphState,
     ) -> GraphState:
-        response = state["sql_response"]
-        trial_num = state.get(
-            "trial_num",
-            0,
-        )
+        sql = state["generated_sql"]
         data_source = state["data_source"]
-        print(f"<<Trial {trial_num}>>")
-
-        match = re.search(
-            r"<SQL>(.*?)</SQL>",
-            response,
-            re.DOTALL,
-        )
-        if match:
-            sql_query = match.group(1).strip()
-        elif trial_num < 3:
-            return GraphState(
-                sql_status="retry",
-                trial_num=trial_num + 1,
-            )
-        else:
-            filtered_data = filter_csv_with_sql(
-                f"SELECT * FROM {data_source}",
-                self.context.conn,
-            )
-            return GraphState(
-                sql_status="generation error",
-                filtered_data=filtered_data,
-            )
 
         filtered_data = filter_csv_with_sql(
-            sql_query,
-            self.context.conn,
+            query=sql,
+            conn=self.context.conn,
         )
-        print("Filtered data length: ", len(filtered_data))
-
         if isinstance(filtered_data, pd.DataFrame) and not filtered_data.empty:
-            if len(filtered_data) >= 10:
-                return GraphState(
-                    sql_status="data over 10",
-                    filtered_data=filtered_data,
-                )
-            else:
-                return GraphState(
-                    sql_status="data under 10",
-                    filtered_data=format_dataframe(
-                        filtered_data,
-                        data_source,
-                    ),
-                )
-        elif trial_num < 3:
+            print("Data Length: ", len(filtered_data))
+            columns_to_show = [
+                column
+                for column in filtered_data.columns
+                if column in self.source_columns[data_source]
+            ]
             return GraphState(
-                sql_status="retry",
-                trial_num=trial_num + 1,
+                sql_status="DATA_EXISTS",
+                filtered_data=filtered_data[columns_to_show],
             )
+        elif isinstance(filtered_data, pd.DataFrame):
+            return GraphState(sql_status="NO_DATA")
         else:
-            return GraphState(sql_status="no data")
+            print(filtered_data)
+            return GraphState(sql_status="RETRY")
