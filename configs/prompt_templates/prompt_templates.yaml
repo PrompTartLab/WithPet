@@ -4,8 +4,8 @@ source_routing_template:
     - question
   template: |
     You are an expert at routing a user question to the appropriate data source. The data sources are described below:
-    Return "pet_places" if the query is about finding or asking for facilities such as hospitals, museums, cafes, restaurants, hotels, or any other physical locations where services or activities are provided.
-    Return "not_relevant" if the query is not related to finding facilities, such as general knowledge questions or general chat.
+    Return "PET_PLACES" if the query is about finding or asking for facilities such as hospitals, museums, cafes, restaurants, hotels, or any other physical locations where services or activities are provided.
+    Return "NOT_RELEVANT" if the query is not related to finding facilities, such as general knowledge questions or general chat.
 
 sql_generation_template:
   _target_: langchain_core.prompts.PromptTemplate

@@ -1,4 +1,4 @@
-pet_places: |
+PET_PLACES: |
   - Table name: PET_PLACES
   - Description: This table contains detailed information about pet-friendly facilities, including their location, amenities, and rules for pet accommodation.
   - Columns:
@@ -38,7 +38,7 @@ pet_places: |
       - FACILITY_INFORMATION (TEXT): Detailed description of the facility.
       - ADDITIONAL_CHARGE_ON_PET (TEXT): Additional charges for pet accommodation.
 
-children_places: |
+CHILDREN_PLACES: |
   - Table name: CHILDREN_PLACES
   - Description: This is the location data of cultural facilities that can be accompanied by family children such as age of entry, parking, nursing room, stroller rental, and kids zone.
   - Columns:
