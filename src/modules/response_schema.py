@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 
 
 class QueryRouter(BaseModel):
-    datasource: Literal["pet_places", "not_relevant"] = Field(
+    datasource: Literal["PET_PLACES", "NOT_RELEVANT"] = Field(
         description="Given a user question choose which datasource would be most relevant for answering their question",
     )
 
