@@ -30,13 +30,14 @@ PET_PLACES: |
       - OPENING_WEEKDAYS (TEXT): Operating weekdays of the facility (e.g. 월화금토일)
       - OPERATION_TIME_DISPLAY (TEXT): Operating hours of the facility for display. Do not use this column in sql filtering.
       - PARKING_LOT_YN (TEXT): Indicates whether parking is available (Y/N).
-      - USAGE_PRICE (TEXT): Details about usage fees.
-      - POSIBLE_PET_SIZE (TEXT): Size limits for pets allowed entry.
-      - PET_LIMIT (TEXT): Restrictions or rules for pet accommodation.
-      - PET_POSSIBLE_AT_INDOOR (TEXT): Indicates whether pets are allowed indoors (Y/N).
-      - PET_POSSIBLE_AT_OUTDOOR (TEXT): Indicates whether pets are allowed outdoors (Y/N).
-      - FACILITY_INFORMATION (TEXT): Detailed description of the facility.
-      - ADDITIONAL_CHARGE_ON_PET (TEXT): Additional charges for pet accommodation.
+      - USAGE_PRICE (TEXT): Details about usage fees. Do not use this column in sql filtering.
+      - POSIBLE_PET_SIZE (TEXT): Size limits for pets allowed entry. Do not use this column in sql filtering.
+      - PET_LIMIT (TEXT): Restrictions or rules for pet accommodation. Do not use this column in sql filtering.
+      - PET_POSSIBLE_AT_INDOOR (TEXT): Indicates whether pets are allowed indoors (Y/N). Do not use this column in sql filtering.
+      - PET_POSSIBLE_AT_OUTDOOR (TEXT): Indicates whether pets are allowed outdoors (Y/N). Do not use this column in sql filtering.
+      - FACILITY_INFORMATION (TEXT): Detailed description of the facility. Do not use this column in sql filtering.
+      - ADDITIONAL_CHARGE_ON_PET (TEXT): Additional charges for pet accommodation. Do not use this column in sql filtering.
+      - SUMMARY (TEXT): Description or revies of the facility Do not use this column in sql filtering.
 
 CHILDREN_PLACES: |
   - Table name: CHILDREN_PLACES
