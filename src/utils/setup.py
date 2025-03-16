@@ -2,9 +2,12 @@ from typing import Optional
 
 from sqlite3 import Connection
 
+from pinecone import Pinecone
+
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain_core.prompts import PromptTemplate
 from langchain_community.vectorstores import FAISS
+from langchain_pinecone import PineconeVectorStore
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 from omegaconf import DictConfig
@@ -49,8 +52,8 @@ class SetUp:
         embeddings: OpenAIEmbeddings,
     ) -> FAISS:
         vs_example = FAISS.load_local(
-            self.config.vector_store_example,
-            embeddings,
+            folder_path=self.config.vector_store_example,
+            embeddings=embeddings,
             allow_dangerous_deserialization=True,
         )
         return vs_example
@@ -58,12 +61,10 @@ class SetUp:
     def get_vs_data(
         self,
         embeddings: OpenAIEmbeddings,
-    ) -> FAISS:
-        vs_data = FAISS.load_local(
-            self.config.vector_store_data,
-            embeddings,
-            allow_dangerous_deserialization=True,
-        )
+    ) -> PineconeVectorStore:
+        pc = Pinecone(api_key=self.config.pinecone_api_key)
+        index = pc.Index(name=self.config.pinecone_index_name)
+        vs_data = PineconeVectorStore(index=index, embedding=embeddings)
         return vs_data
 
     def get_context(

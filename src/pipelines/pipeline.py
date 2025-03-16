@@ -129,10 +129,7 @@ def load_workflow(
     llm_stream = setup.get_llm_stream(chat_callback_handler) if stream else llm
     conn = setup.get_connection()
     vs_example = setup.get_vs_example(embeddings=embeddings)
-    if os.path.exists(config.vector_store_data):
-        vs_data = setup.get_vs_data(embeddings=embeddings)
-    else:
-        vs_data = None
+    vs_data = setup.get_vs_data(embeddings=embeddings)
 
     context = setup.get_context(
         llm=llm,
@@ -351,8 +348,8 @@ def pipeline(
                 {"recursion_limit": 10},
             )
             if (
-                response["data_source"] == "not_relevant"
-                or response["sql_status"] == "no data"
+                response["data_source"] == "NOT_RELEVANT"
+                or response["sql_status"] == "NO_DATA"
             ):
                 send_message(
                     response["answer"],
