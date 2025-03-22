@@ -37,7 +37,7 @@ PET_PLACES: |
       - PET_POSSIBLE_AT_OUTDOOR (TEXT): Indicates whether pets are allowed outdoors (Y/N). Do not use this column in sql filtering.
       - FACILITY_INFORMATION (TEXT): Detailed description of the facility. Do not use this column in sql filtering.
       - ADDITIONAL_CHARGE_ON_PET (TEXT): Additional charges for pet accommodation. Do not use this column in sql filtering.
-      - SUMMARY (TEXT): Description or revies of the facility Do not use this column in sql filtering.
+      - SUMMARY (TEXT): Description or reviews of the facility Do not use this column in sql filtering.
 
 CHILDREN_PLACES: |
   - Table name: CHILDREN_PLACES
