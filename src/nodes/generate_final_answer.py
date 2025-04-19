@@ -52,6 +52,4 @@ class HandleNoDataNode(BaseNode):
         self,
         state: GraphState,
     ) -> GraphState:
-        return GraphState(
-            answer="해당 질문에 해당하는 장소를 찾지 못했습니다. 새로운 조건으로 질문해주세요."
-        )
+        return GraphState(answer="해당 질문에 해당하는 장소를 찾지 못했습니다. 새로운 조건으로 질문해주세요.")
