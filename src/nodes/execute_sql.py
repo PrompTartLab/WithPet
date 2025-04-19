@@ -38,9 +38,11 @@ class ExecuteSQLNode(BaseNode):
                 for column in filtered_data.columns
                 if column in self.source_columns[data_source]
             ]
+
+            serializable_data = filtered_data[columns_to_show].to_dict(orient="records")
             return GraphState(
                 sql_status="DATA_EXISTS",
-                filtered_data=filtered_data[columns_to_show],
+                filtered_data=serializable_data,
             )
         elif isinstance(filtered_data, pd.DataFrame):
             return GraphState(sql_status="NO_DATA")

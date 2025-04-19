@@ -52,7 +52,7 @@ class SQLWorkflow:
         self.source_columns = source_columns
         self.answer_generation_template = answer_generation_template
 
-    def setup_workflow(self) -> CompiledStateGraph:
+    def setup_workflow(self, memory=None) -> CompiledStateGraph:
         select_data_node = SelectDataNode(
             context=self.context,
             schemas=self.schemas,
@@ -162,7 +162,12 @@ class SQLWorkflow:
         )
 
         self.workflow.set_entry_point("select_data_source")
-        self.app = self.workflow.compile()
+
+        if memory:
+            self.app = self.workflow.compile(checkpointer=memory)
+        else:
+            self.app = self.workflow.compile()
+        # self.app = self.workflow.compile(checkpointer=memory)
         return self.app
 
     def check_data_source(

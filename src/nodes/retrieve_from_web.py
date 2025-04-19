@@ -62,7 +62,6 @@ class WebSearchNode(BaseNode):
         query: str,
         llm: ChatOpenAI,
     ) -> str:
-
         prompt = PromptTemplate(
             template=self.search_template,
             input_variables=["query"],

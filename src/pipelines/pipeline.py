@@ -1,9 +1,11 @@
 import os
+import uuid
 
 import streamlit as st
 
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain_openai import OpenAIEmbeddings
+from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.errors import GraphRecursionError
 
@@ -11,6 +13,7 @@ from hydra.utils import instantiate
 from omegaconf import DictConfig
 
 from ..utils.setup import SetUp
+from ..utils.conversation_utils import get_history
 from ..workflows.sql_workflow import SQLWorkflow
 
 
@@ -119,7 +122,6 @@ def load_workflow(
     config: DictConfig,
     stream: bool = True,
 ) -> CompiledStateGraph:
-
     chat_callback_handler = ChatCallbackHandler()
     embeddings = get_embeddings(api_key=config.openai_api_key)
 
@@ -153,6 +155,8 @@ def load_workflow(
         prompt_type=config.prompt_type.question_refinement_template
     )
 
+    memory = MemorySaver()
+
     workflow = SQLWorkflow(
         context=context,
         source_routing_template=source_routing_template,
@@ -163,14 +167,13 @@ def load_workflow(
         question_refinement_template=question_refinement_template,
     )
 
-    app = workflow.setup_workflow()
+    app = workflow.setup_workflow(memory)
     return app
 
 
 def pipeline(
     config: DictConfig,
 ) -> None:
-
     app = load_workflow(
         config=config,
         stream=True,
@@ -233,9 +236,12 @@ def pipeline(
     if "selected_options" not in st.session_state:
         st.session_state.selected_options = []
 
+    # Initialize thread_id in session state if not present
+    if "thread_id" not in st.session_state:
+        st.session_state.thread_id = str(uuid.uuid4())
+
     # Sidebar Design
     with st.sidebar:
-
         # Use `st.form` to prevent auto-rerun for filters
         with st.form("filter_form"):
             st.markdown(
@@ -346,10 +352,19 @@ def pipeline(
             placeholder.markdown(
                 "⌛질문에 해당하는 장소를 찾고 있습니다... 잠시만 기다려주세요."
             )
+
         try:
+            history_message = get_history(
+                st.session_state.inputs["question"], st.session_state["messages"]
+            )
+
+            config_dict = {
+                "configurable": {"thread_id": st.session_state.thread_id},
+                "recursion_limit": 10,
+            }
             response = app.invoke(
-                st.session_state.inputs,
-                {"recursion_limit": 10},
+                history_message,
+                config_dict,
             )
             if (
                 response["data_source"] == "NOT_RELEVANT"

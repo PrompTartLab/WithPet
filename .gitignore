@@ -1,4 +1,5 @@
 # folder
+*.DS_store
 .streamlit/secrets.toml
 *.pyc
 
